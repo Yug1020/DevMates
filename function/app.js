@@ -1,20 +1,27 @@
 import express from "express";
-import http from "http";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
+import { signUp } from "./src/controllers/signUp.js";
 
 const app = express()
 
-app.use("/hello/yug", (req, res) => {
-    res.send("Hello Mr.Author")
-})
+async function main(){
 
-app.use("/hello", (req, res) => {
-    res.send("hello welcome to nothing");
-});
+try {
 
-app.use("/", (req, res) => {
-    res.send("NamasteNode User")
-})
+    await mongoose.connect(process.env.MONGODB)
 
-app.listen(3000, () => {
-    console.log("Successfully started server on 3000")
-})
+    console.log("successfully connected")   
+    
+    
+    app.post(/^\/signup$/, signUp)
+    
+    // app.use("/", (req, res) => {res.send("successfully live on 5375")})
+    
+    app.listen(5375, console.log("successfully live on 5375"))
+
+    }catch (error) {
+        console.log(error)
+    }
+}main()
