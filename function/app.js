@@ -2,6 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import { signUp } from "./src/controllers/signUp.js";
 import { feed } from "./src/controllers/feed.js";
+import { update } from "./src/controllers/update.js";
+import { del_profile } from "./src/controllers/del_profile.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -10,11 +12,10 @@ const app = express()
 async function main(){
 
 app.use(express.json())
-
 app.post(/^\/signup$/, signUp)
-
 app.get(/^\/feed$/, feed)
-
+app.patch(/^\/update_profile/, update)
+app.delete(/^\/delete_profile/, del_profile)
 try {
     await mongoose.connect(process.env.MONGODB)
     console.log("successfully connected")   
