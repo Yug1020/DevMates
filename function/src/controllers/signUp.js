@@ -2,18 +2,11 @@ import express from "express";
 import mongoose from "mongoose";
 import { User } from "../models/user.js"
 
-const app = express();
-
 export const signUp = async(req, res) => {
     try{
-        const new_user = new User({
-            firstName: "Virat",
-            lastName: "kohli",
-            email: "viratkohli@gmail.com",
-            gender: "Male",
-            age: 21
-            }            
-        ) 
+        const user = req.body
+        console.log(user)
+        const new_user = new User(user) 
         await new_user.save()
         res.send("successfully added new user on database")
     }catch(err){
