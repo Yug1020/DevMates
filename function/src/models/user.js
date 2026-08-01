@@ -1,21 +1,17 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
-    {firstName:{
-        type: String
+    {
+        firstName:{type: String, required:[true, "First Name is mandatory field"]}, 
+        //In above required validator we aslo throw custome error message
+        lastName:{type: String},
+        email:{type: String, required:true, unique:true},
+        gender:{type: String, required:true},
+        age:{type: Number, required:true},
+        phone:{type: Number, required:[true, "phone number is mandatory field"], validate(value){if(value !== 10){throw new Error("phone number should be 10 digits")}}},
+        photoURL:{type: String, default:"https://static.vecteezy.com/system/resources/previews/018/765/757/non_2x/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg"}
     },
-    lastName:{
-        type: String
-    },
-    email:{
-        type: String
-    },
-    gender:{
-        type: String
-    },
-    age:{
-        type: Number
-    }}
+    {timestamps:true}
 )
 
 const User = mongoose.model("User", userSchema);

@@ -4,8 +4,9 @@ import mongoose from "mongoose"
 export const feed = async(req, res) => {
     try{
         const req_email = req.body
-        console.log("virat mailID", req_email)
-        const allUser = await User.find({email:"viratkohli@gmail.com"})
+        console.log(req_email)
+        //if req_email === 0 it will found all user in databse from User documents
+        const allUser = await User.find(req_email)
         if(allUser.length === 0){
             res.send("No user found")
         }else{
