@@ -14,7 +14,7 @@ async function main(){
 app.use(express.json())
 app.post(/^\/signup$/, signUp)
 app.get(/^\/feed$/, feed)
-app.patch(/^\/update_profile/, update)
+app.patch("/update_profile/:profile_id", update)
 app.delete(/^\/delete_profile/, del_profile)
 try {
     await mongoose.connect(process.env.MONGODB)
