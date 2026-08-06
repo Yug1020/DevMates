@@ -1,10 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 import { signUp } from "./src/controllers/signUp.js";
 import { login } from "./src/controllers/login.js";
 import { feed } from "./src/controllers/feed.js";
 import { update } from "./src/controllers/update.js";
 import { del_profile } from "./src/controllers/del_profile.js";
+import { profile } from "./src/controllers/profile.js"
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -13,8 +15,10 @@ const app = express()
 async function main(){
 
 app.use(express.json())
+app.use(cookieParser())
 app.post(/^\/signup$/, signUp)
 app.post(/^\/login$/, login)
+app.get(/^\/profile$/, profile)
 app.get(/^\/feed$/, feed)
 app.patch("/update_profile/:profile_id", update)
 app.delete(/^\/delete_profile$/, del_profile)
