@@ -1,9 +1,16 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 const userSchema = new mongoose.Schema(
     {
-        firstName:{type: String, required:[true, "First Name is mandatory field"], min:2, max:15}, 
+        firstName:{type: String, required:[true, "First Name is mandatory field"], min:2, max:15},
+
         //In above required validator we aslo throw custome error message
+
         lastName:{type: String, min:2, max:15},
         streetName:{type:String, min:2, max:15},
         email:{type: String, required:true, trim:true, unique:[true, "account with this email already exist"], max: 45},
@@ -20,6 +27,19 @@ const userSchema = new mongoose.Schema(
     },
     {timestamps:true}
 )
+
+
+userSchema.methods.generateAuthtoken = function() {
+    const payload = {user_id : this._id}
+    const token = jwt.sign(payload , process.env.secretKey, {expiresIn: "1hr"})
+    return token;
+}
+
+userSchema.methods.verifyPassword = async function(passwordInputByUser){
+    const match = await bcrypt.compare(passwordInputByUser, this.password)
+
+    return match
+}
 
 const User = mongoose.model("User", userSchema);
 

@@ -7,6 +7,7 @@ import { feed } from "./src/controllers/feed.js";
 import { update } from "./src/controllers/update.js";
 import { del_profile } from "./src/controllers/del_profile.js";
 import { profile } from "./src/controllers/profile.js"
+import { authHandler } from "./src/middlewares/authHandler.js"
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -16,12 +17,17 @@ async function main(){
 
 app.use(express.json())
 app.use(cookieParser())
+
+//only routes without restriction
 app.post(/^\/signup$/, signUp)
 app.post(/^\/login$/, login)
-app.get(/^\/profile$/, profile)
-app.get(/^\/feed$/, feed)
-app.patch("/update_profile/:profile_id", update)
-app.delete(/^\/delete_profile$/, del_profile)
+
+//All following routes are restricted and the authHandler is compulsory.
+app.get(/^\/profile$/, authHandler, profile)
+app.get(/^\/feed$/, authHandler, feed)
+app.patch("/update_profile/:profile_id",authHandler, update)
+app.delete(/^\/delete_profile$/,authHandler, del_profile)
+
 try {
     await mongoose.connect(process.env.MONGODB)
     console.log("successfully connected to DB")   
