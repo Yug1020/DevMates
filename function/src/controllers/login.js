@@ -10,16 +10,23 @@ export const login = async (req, res) => {
     try{
         const isMail = await User.findOne({email});
 
-        if(!isMail){res.send("Invalid credentials")}
+        if(!isMail){
+            return res.send("Invalid credentials")
+        }
         
-        // const match = await bcrypt.compare(password, isMail.password);
+        //Mongoose method of password verification
         const match = await isMail.verifyPassword(password)
 
+    //another way to verify password
+        // const match = await bcrypt.compare(password, isMail.password);  
+        
+    //another way of token generation
         // const payload = { user_id : isMail._id}
+        // const token = jwt.sign(payload, process.env.secretKey, {expiresIn: "1hr"}) //This expire time is for token expiry time in server        
 
-        // const token = jwt.sign(payload, process.env.secretKey, {expiresIn: "1hr"}) //This expire time is for token expiry time in server
-
+        
         if(match){
+            //isMail.generateAuthtoken() is Mongoose method of token generation
             const cookie = res.cookie("auth_token", isMail.generateAuthtoken(), // isMail.generateAuthtoken() is the way to generate user token using mongoose methods
                 {
                     httpOnly: true, //Prevents client-side JS from reading the cookie
@@ -27,9 +34,9 @@ export const login = async (req, res) => {
                     maxAge: 7 * 86400 //7 days of expire time (3 hrs * 86400(sec in a day))  
                 }
             )
-            res.send("Login Successfully")
+            return res.send("Login Successfully")
         }else{
-            res.send("Invalid credentials")
+            return res.send("Invalid credentials")
         }
 
     }catch(err){

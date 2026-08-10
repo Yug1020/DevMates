@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
     {
         firstName:{type: String, required:[true, "First Name is mandatory field"], min:2, max:15},
 
-        //In above required validator we aslo throw custome error message
+        //In above required validator we also throw custome error message
 
         lastName:{type: String, min:2, max:15},
         streetName:{type:String, min:2, max:15},

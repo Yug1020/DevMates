@@ -10,21 +10,18 @@ export const signUp = async(req, res) => {
     try{
         const {firstName, lastName, streetName, email, password, gender, age, phone, skills} = req.body
         if(!(isEmail(email))){
-            res.send("Enter Valid Email")
+            return res.send("Enter Valid Email")
         }
-        if(!(isStrongPassword(password))){
-            res.send("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special symbol.")
+        else if(!(isStrongPassword(password))){
+            return res.send("Your password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special symbol.")
         }
 
         const hashedpassword = await bcrypt.hash(password, 10);
-
-        // console.log(firstName, lastName, streetName, email, hashedpassword, gender, age, phone, skills)
 
         const missing = required.filter(field => !(Object.keys(req.body)).includes(field))
         if(missing.length !== 0){
             return res.send(missing + " is required to signing in")
         }
-        // console.log("user", req.body)
 
         const new_user = new User({
             firstName, lastName, streetName, email, password: hashedpassword, gender, age, phone, skills

@@ -1,8 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
-import { signUp } from "./src/controllers/signUp.js";
-import { login } from "./src/controllers/login.js";
+import { authRoute } from "./src/route/authRoute.js"
 import { feed } from "./src/controllers/feed.js";
 import { update } from "./src/controllers/update.js";
 import { del_profile } from "./src/controllers/del_profile.js";
@@ -19,8 +18,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 //only routes without restriction
-app.post(/^\/signup$/, signUp)
-app.post(/^\/login$/, login)
+app.use("/", authRoute)
 
 //All following routes are restricted and the authHandler is compulsory.
 app.get(/^\/profile$/, authHandler, profile)
