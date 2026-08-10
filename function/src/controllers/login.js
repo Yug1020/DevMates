@@ -9,6 +9,7 @@ export const login = async (req, res) => {
     const {email, password} = req.body;
     try{
         const isMail = await User.findOne({email});
+        console.log(isMail)
 
         if(!isMail){
             return res.send("Invalid credentials")

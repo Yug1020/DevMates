@@ -15,7 +15,6 @@ export const logout = (req, res) => {
             
             res.cookie("auth_token", "", 
                 {
-                    
                     expires: new Date(Date.now()),
                     httpOnly: true, //Prevents client-side JS from reading the cookie
                     secure: true,   //Ensures the cookie is only sent over HTTPS (useful for production) 

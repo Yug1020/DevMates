@@ -1,8 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
-import { authRoute } from "./src/route/authRoute.js"
-import { feed } from "./src/controllers/feed.js";
+
+import { authRoute } from "./src/route/authRoute.js";
+import { userRoute } from "./src/route/userRoute.js";
+import { profileRoute } from "./src/route/profileRoute.js";
+
 import { update } from "./src/controllers/update.js";
 import { del_profile } from "./src/controllers/del_profile.js";
 import { profile } from "./src/controllers/profile.js"
@@ -18,13 +21,13 @@ app.use(express.json())
 app.use(cookieParser())
 
 //only routes without restriction
-app.use("/", authRoute)
+app.use("/", authRoute);
 
-//All following routes are restricted and the authHandler is compulsory.
-app.get(/^\/profile$/, authHandler, profile)
-app.get(/^\/feed$/, authHandler, feed)
-app.patch("/update_profile/:profile_id",authHandler, update)
-app.delete(/^\/delete_profile$/,authHandler, del_profile)
+app.use("/user", userRoute);
+app.use("/user/profile", profileRoute);
+
+
+
 
 try {
     await mongoose.connect(process.env.MONGODB)
