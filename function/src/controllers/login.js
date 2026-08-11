@@ -12,7 +12,7 @@ export const login = async (req, res) => {
         console.log(isMail)
 
         if(!isMail){
-            return res.send("Invalid credentials")
+            return res.status(404).send("Invalid credentials")
         }
         
         //Mongoose method of password verification

@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import { authRoute } from "./src/route/authRoute.js";
 import { userRoute } from "./src/route/userRoute.js";
 import { profileRoute } from "./src/route/profileRoute.js";
+import { connectionReqRoute } from "./src/route/connectionReqRoute.js";
 
 import { update } from "./src/controllers/update.js";
 import { del_profile } from "./src/controllers/del_profile.js";
@@ -25,6 +26,7 @@ app.use("/", authRoute);
 
 app.use("/user", userRoute);
 app.use("/user/profile", profileRoute);
+app.use("/connectionRequest", connectionReqRoute);
 
 
 
