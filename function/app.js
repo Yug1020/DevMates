@@ -26,7 +26,7 @@ app.use("/", authRoute);
 
 app.use("/user", userRoute);
 app.use("/user/profile", profileRoute);
-app.use("/connectionRequest", connectionReqRoute);
+app.use("/connections", connectionReqRoute);
 
 
 

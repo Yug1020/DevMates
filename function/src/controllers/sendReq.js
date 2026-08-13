@@ -1,10 +1,21 @@
 import express from "express";
 import { ConnectionRequest } from "../models/connectionRequest.js";
+import { User } from "../models/user.js";
+
+
+const USER_INFO = ["firstName", "lastName", "email", "gender", "age", "phone", "skills"]
 
 export const sendReq = async(req, res) => {
-    try{const fromRequest = req.user._id;
+    try{
+    const fromRequest = req.user._id;
     const toRequest = req.params.toUserId;
-    const status = req.params.status;
+    const sentStatus = req.params.sentStatus;
+
+    const real_user = await User.findById(toRequest)
+
+    if(!real_user){
+        return res.status(404).json("User doesn't exist")
+    }
 
     const reqExist = await ConnectionRequest.findOne({
         $or:
@@ -13,8 +24,8 @@ export const sendReq = async(req, res) => {
             {fromRequest: toRequest, toRequest: fromRequest}
         ]
     })
-    if(reqExist && reqExist.status !== status){
-        const cursor = await ConnectionRequest.findOneAndUpdate(reqExist._id, {status: status});
+    if(reqExist && reqExist.sentStatus !== sentStatus && reqExist.receivedStatus === "pending"){
+        const cursor = await ConnectionRequest.findOneAndUpdate(reqExist._id, {sentStatus: sentStatus});
 
         return res.send("request has been updated")
     }
@@ -26,13 +37,63 @@ export const sendReq = async(req, res) => {
     const data = new ConnectionRequest({
         fromRequest: fromRequest,
         toRequest: toRequest,
-        status: status        
+        sentStatus: sentStatus
+        // sentStatus: sentStatus        
     })
     
     await data.save()
 
-    res.json(data)}
-    catch(error){
+    res.json(data)
+    }catch(error){
         res.status(400).send("something is wrong, " + error)
+    }
+}
+
+export const recevReq = async(req, res) => {
+    try {
+        const loggedInUser = req.user;
+        const receivedStatus = req.params.receivedStatus;
+        const fromId = req.params.fromUserId;
+
+        const quiery = {fromRequest: fromId, toRequest: loggedInUser._id, sentStatus: "connect"}; //, receivedStatus: "pending"
+
+        const reqExist = await ConnectionRequest.findOneAndUpdate(quiery, {receivedStatus: receivedStatus}, {returnDocument:"after"}).populate('fromRequest', USER_INFO)
+
+        const data = reqExist.fromRequest
+        
+        if(!reqExist){
+            throw new Error() //Fix the or show the real status
+        }
+
+        res.json(data)
+
+    } catch (error) {
+        res.send("Something is wrong")
+    }
+}
+
+export const connectionList = async(req, res) => {
+    try {
+        const loggedInUser = req.user._id;
+
+        const quiery = {$or:[{fromRequest:loggedInUser}, {toRequest:loggedInUser}], sentStatus: "connect", receivedStatus: "accept"}
+
+        const reqExist = await ConnectionRequest.find(quiery).populate("fromRequest", USER_INFO).populate("toRequest", USER_INFO);
+        
+
+        const data = reqExist.map((row) => {
+            const fromIdString = row.fromRequest._id.toString();
+            const loggedInString = loggedInUser.toString();
+        
+            if (fromIdString === loggedInString) {
+                return row.toRequest;
+            } else {
+                return row.fromRequest;
+            }
+        });
+
+        res.send(data)
+    } catch (error) {
+        res.status("400").send("Something is wrong")
     }
 }

@@ -4,9 +4,10 @@ dotenv.config();
 
 const connectionRequestSchema = new mongoose.Schema(
     {
-        fromRequest: { type: mongoose.ObjectId },
-        toRequest: { type: mongoose.ObjectId },
-        status: { type: String, enum:{ values:["pass", "connect", "ignored"]}}
+        fromRequest: { type: mongoose.ObjectId , ref:"User"},
+        toRequest: { type: mongoose.ObjectId, ref:"User" },
+        sentStatus: { type: String, enum:{ values:["pass", "connect", "ignored"]}},
+        receivedStatus: {type: String, enum:{ values:[ "pending", "accept", "reject"] }, default:"pending" }
     }, { timestamps: true }
 )
 
@@ -19,7 +20,6 @@ connectionRequestSchema.pre("save", function (next) {
     // 2. Throw an error or pass it to next()
     throw new Error("Cannot send connection request to yourself!");
   }
-  next()
 });
 
 const ConnectionRequest = mongoose.model("ConnectionRequest", connectionRequestSchema);
