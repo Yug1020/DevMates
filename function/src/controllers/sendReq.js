@@ -55,9 +55,9 @@ export const recevReq = async(req, res) => {
         const receivedStatus = req.params.receivedStatus;
         const fromId = req.params.fromUserId;
 
-        const quiery = {fromRequest: fromId, toRequest: loggedInUser._id, sentStatus: "connect"}; //, receivedStatus: "pending"
+        const query = {fromRequest: fromId, toRequest: loggedInUser._id, sentStatus: "connect"}; //, receivedStatus: "pending"
 
-        const reqExist = await ConnectionRequest.findOneAndUpdate(quiery, {receivedStatus: receivedStatus}, {returnDocument:"after"}).populate('fromRequest', USER_INFO)
+        const reqExist = await ConnectionRequest.findOneAndUpdate(query, {receivedStatus: receivedStatus}, {returnDocument:"after"}).populate('fromRequest', USER_INFO)
 
         const data = reqExist.fromRequest
         
@@ -76,10 +76,13 @@ export const connectionList = async(req, res) => {
     try {
         const loggedInUser = req.user._id;
 
-        const quiery = {$or:[{fromRequest:loggedInUser}, {toRequest:loggedInUser}], sentStatus: "connect", receivedStatus: "accept"}
+        const query = {$or:[{fromRequest:loggedInUser}, {toRequest:loggedInUser}], sentStatus: "connect", receivedStatus: "accept"}
 
-        const reqExist = await ConnectionRequest.find(quiery).populate("fromRequest", USER_INFO).populate("toRequest", USER_INFO);
+        const reqExist = await ConnectionRequest.find(query).populate("fromRequest", USER_INFO).populate("toRequest", USER_INFO);
         
+        if (!reqExist){
+            throw new Error(error)
+        }
 
         const data = reqExist.map((row) => {
             const fromIdString = row.fromRequest._id.toString();
@@ -94,6 +97,6 @@ export const connectionList = async(req, res) => {
 
         res.send(data)
     } catch (error) {
-        res.status("400").send("Something is wrong")
+        res.status(400).send("Something is wrong")
     }
 }
