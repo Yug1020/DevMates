@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.terminal-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Custom Input Styles overriding forms plugin for dark mode/IDE feel */
+input[type="email"],
+input[type="password"] {
+  background-color: #0D1117 !important; /* Darker than surface */
+  color: #dde4dd !important;
+  border-color: #30363D !important;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #4edea3 !important; /* Emerald focus */
+  box-shadow: none !important;
+}
