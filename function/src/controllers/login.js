@@ -9,9 +9,8 @@ export const login = async (req, res) => {
     const {email, password} = req.body;
     try{
         const isMail = await User.findOne({email});
-        // const { firstName, lastName, email, gender, age, phone, skills } = isMail
-        // const filteredUserInfo = { isMail.firstName, isMail.lastName, isMail.email, isMail.gender, isMail.age, isMail.phone, isMail.skills }  
-        console.log(isMail)
+        const filteredUserInfo = { firstName: isMail.firstName, lastName: isMail.lastName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, skills: isMail.skills }  
+        // console.log("filteredUserInfo", filteredUserInfo)
 
         if(!isMail){
             return res.status(404).send("Invalid credentials")
@@ -37,7 +36,7 @@ export const login = async (req, res) => {
                     maxAge: 7 * 86400 //7 days of expire time (3 hrs * 86400(sec in a day))  
                 }
             )
-            return res.send(isMail)
+            return res.send(filteredUserInfo)
         }else{
             return res.send("Invalid credentials")
         }

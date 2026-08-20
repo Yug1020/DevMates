@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
         age:{type: Number, required:true, maxlength:3},
         phone:{type: Number, required:[true, "phone number is mandatory field"], validate(value){if(value.toString().length !== 10){throw new Error("phone number should be 10 digits")}}},
         photoURL:{type: String, default:"https://static.vecteezy.com/system/resources/previews/018/765/757/non_2x/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg"},
+        bio:{type:String, max:150},
         skills:{
             type:[String], 
             minlength:1, 

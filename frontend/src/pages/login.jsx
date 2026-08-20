@@ -1,5 +1,5 @@
 import { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import { API_BASE_URL } from '../util/constant';
@@ -7,23 +7,42 @@ import { API_BASE_URL } from '../util/constant';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
   
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setErrorMsg('');
+    setLoading(true);
     try {
-      const res = await axios.post(API_BASE_URL + "/login", {email, password});
-      if(res.status === 200){
-        console.log("User Logged in Successfully!");
-        // navigate("/home");
+      const res = await axios.post(
+        API_BASE_URL + "/login",
+        { email, password },
+        { withCredentials: true }
+      );
+      if (res.status === 200) {
+        if (typeof res.data === 'string' && (res.data.includes('Invalid') || res.data.includes('wrong'))) {
+          setErrorMsg(res.data);
+        } else {
+          console.log("User Logged in Successfully!");
+          navigate("/home");
+        }
       }
     } catch (error) {
       console.log(error);
+      if (error.response && error.response.data) {
+        setErrorMsg(
+          typeof error.response.data === 'string'
+            ? error.response.data
+            : error.response.data.message || 'Invalid email or password'
+        );
+      } else {
+        setErrorMsg('Unable to connect to server. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleGitHubLogin = () => {
-    console.log('Authenticating with GitHub...');
   };
 
   return (
@@ -104,6 +123,14 @@ export default function Login() {
               Enter your credentials to access your dashboard.
             </p>
           </div>
+          {/* Feedback Alert */}
+          {errorMsg && (
+            <div className="mb-4 p-3 rounded bg-[#ffdad6]/10 border border-[#ffb4ab]/30 text-[#ffb4ab] text-xs font-mono-code flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">error</span>
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
           <form className="space-y-md" onSubmit={handleSubmit}>
             {/* Email Input */}
             <div>
@@ -170,54 +197,42 @@ export default function Login() {
             {/* Action Buttons */}
             <div className="pt-sm flex flex-col gap-sm">
               <button
-                className="w-full flex justify-center py-sm px-md border border-transparent rounded-DEFAULT shadow-sm font-mono-label text-mono-label font-bold text-[#000000] bg-primary hover:bg-primary-fixed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-surface transition-colors"
+                disabled={loading}
+                className="w-full flex items-center justify-center py-sm px-md border border-transparent rounded-DEFAULT shadow-sm font-mono-label text-mono-label font-bold text-[#000000] bg-primary hover:bg-primary-fixed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 type="submit"
               >
-                <span className="material-symbols-outlined mr-sm text-[20px]">
-                  login
-                </span>
-                Execute Login
-              </button>
-              <div className="relative flex py-sm items-center">
-                <div className="flex-grow border-t border-outline-variant" />
-                <span className="flex-shrink-0 mx-sm text-on-surface-variant font-mono-label text-mono-label text-[11px] uppercase tracking-widest">
-                  Or
-                </span>
-                <div className="flex-grow border-t border-outline-variant" />
-              </div>
-              <button
-                className="w-full flex justify-center py-sm px-md border border-outline-variant rounded-DEFAULT shadow-sm font-mono-label text-mono-label text-on-surface bg-transparent hover:bg-surface-container hover:border-outline transition-colors"
-                type="button"
-                onClick={handleGitHubLogin}
-              >
-                <svg
-                  aria-hidden="true"
-                  className="w-5 h-5 mr-sm"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    clipRule="evenodd"
-                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                    fillRule="evenodd"
-                  />
-                </svg>
-                Authenticate with GitHub
+                {loading ? (
+                  <>
+                    <span className="material-symbols-outlined mr-sm text-[20px] animate-spin">
+                      progress_activity
+                    </span>
+                    Authenticating...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined mr-sm text-[20px]">
+                      login
+                    </span>
+                    Execute Login
+                  </>
+                )}
               </button>
             </div>
           </form>
+
           <p className="mt-lg text-center font-body-sm text-body-sm text-on-surface-variant">
             Don't have an account?{' '}
-            <a
+            <Link
               className="font-medium text-secondary hover:text-secondary-fixed transition-colors inline-flex items-center gap-1 group"
-              href="#"
+              to="/signup"
             >
               Create one
               <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">
                 arrow_forward
               </span>
-            </a>
+            </Link>
           </p>
+
         </div>
       </div>
     </div>
