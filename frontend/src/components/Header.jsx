@@ -1,4 +1,9 @@
+import { useSelector } from "react-redux";
+
 export default function Header({ onOpenMobileSidebar, searchQuery, setSearchQuery }) {
+
+  const userInfo = useSelector((state)=> state.user);
+
   return (
     <header className="h-16 border-b border-[#1e2630] bg-[#0c1015]/80 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30">
       {/* Left: Mobile Menu Toggle & Search Bar */}
@@ -42,11 +47,14 @@ export default function Header({ onOpenMobileSidebar, searchQuery, setSearchQuer
           {/* Active notification green badge */}
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#4edea3] ring-2 ring-[#0c1015]" />
         </button>
-
+        <div className="flex items-center gap-2 ml-2">
+          <p className="text-white text-sm">Hello, {userInfo?.firstName}</p>
+        </div>
         {/* User Profile Avatar */}
         <div className="w-8 h-8 rounded-full border border-[#2c3744] overflow-hidden bg-[#161e27] flex items-center justify-center cursor-pointer hover:border-[#4edea3] transition-colors">
+          {/* {console.log(userInfo?.firstName)} */}
           <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&q=80"
+            src={userInfo.image}
             alt="User"
             className="w-full h-full object-cover"
           />

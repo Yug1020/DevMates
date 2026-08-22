@@ -9,7 +9,7 @@ export const login = async (req, res) => {
     const {email, password} = req.body;
     try{
         const isMail = await User.findOne({email});
-        const filteredUserInfo = { firstName: isMail.firstName, lastName: isMail.lastName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, skills: isMail.skills }  
+        const filteredUserInfo = { firstName: isMail.firstName, lastName: isMail.lastName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, image: isMail.photoURL, skills: isMail.skills }  
         // console.log("filteredUserInfo", filteredUserInfo)
 
         if(!isMail){

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../store/userSlice';
 
 import { API_BASE_URL } from '../util/constant';
 
@@ -10,6 +12,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
   
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -26,6 +30,7 @@ export default function Login() {
           setErrorMsg(res.data);
         } else {
           console.log("User Logged in Successfully!");
+          dispatch(setUser(res.data));
           navigate("/home");
         }
       }
