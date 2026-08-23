@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 export default function Header({ onOpenMobileSidebar, searchQuery, setSearchQuery }) {
 
@@ -54,7 +55,7 @@ export default function Header({ onOpenMobileSidebar, searchQuery, setSearchQuer
         <div className="w-8 h-8 rounded-full border border-[#2c3744] overflow-hidden bg-[#161e27] flex items-center justify-center cursor-pointer hover:border-[#4edea3] transition-colors">
           {/* {console.log(userInfo?.firstName)} */}
           <img
-            src={userInfo.image}
+            src={userInfo?.photoURL}
             alt="User"
             className="w-full h-full object-cover"
           />

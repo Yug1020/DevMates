@@ -51,14 +51,14 @@ export default function Sidebar({ mobileOpen, onCloseMobile }) {
       {/* Mobile Backdrop Overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="sticky inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={onCloseMobile}
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:static top-0 left-0 bottom-0 z-50 w-60 bg-[#0c1015] border-r border-[#1e2630] flex flex-col justify-between select-none transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`sticky lg:static top-0 left-0 bottom-0 z-20 w-60 h-[calc(100vh-4rem)] bg-[#0c1015] border-r border-[#1e2630] flex flex-col justify-between select-none transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

@@ -1,23 +1,33 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/login';
-import SignUp from './pages/signUp';
-import Home from './pages/home';
 import { Provider } from "react-redux";
 import appStore from "./util/store";
 import './App.css';
+
+import ProtectedRoutes from './util/ProtectedRoutes.jsx';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/login';
+import SignUp from './pages/signUp';
 
 function App() {
   return (
     <Provider store={appStore}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/network" element={<Home />} />
+          {/* Public routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/signin" element={<Navigate to="/signup" replace />} />
-          <Route path="*" element={<Navigate to="/home" replace />} />
+
+          {/* Protected layout — all child routes are managed inside Dashboard */}
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoutes>
+                <Dashboard />
+              </ProtectedRoutes>
+            }
+          />
+          {/* Fallback */}
+          {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
         </Routes>
       </BrowserRouter>
     </Provider>

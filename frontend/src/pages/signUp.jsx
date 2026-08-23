@@ -216,14 +216,13 @@ export default function SignUp() {
 
         {/* Bottom: Version & Status */}
         <div className="relative z-10 font-mono-code text-xs text-[#3c4a42] tracking-wider">
-          v2.4.1 // INITIALIZING_SESSION
+          v1.0.0 // INITIALIZING_SESSION
         </div>
       </div>
 
       {/* Right Side: Registration / Create Account Form */}
-      <div className="w-full lg:w-7/12 flex items-center justify-center p-4 sm:p-8 md:p-12 min-h-full">
-        <div className="w-full max-w-xl bg-[#161d19] border border-[#242c27] rounded-lg p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.6)] mt-3 mb-3 relative">
-          
+      <div className="w-full lg:w-7/12 flex items-center justify-center p-4  sm:p-8 md:p-12 min-h-full">
+        <div className="w-full  max-w-10/12  bg-[#161d19] border border-[#242c27] rounded-lg p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.6)] mt-3 mb-3 relative">
           {/* Header Row: Title on Left, Avatar Popover Trigger on Right */}
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
@@ -625,7 +624,6 @@ export default function SignUp() {
               </Link>
             </p>
           </div>
-
         </div>
       </div>
     </div>

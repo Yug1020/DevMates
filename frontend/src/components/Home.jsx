@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import DeveloperCard from '../components/DeveloperCard';
+import Sidebar from './Sidebar';
+import Header from './Header';
+import DeveloperCard from './DeveloperCard';
 
 const INITIAL_DEVELOPERS = [
   {
@@ -98,6 +98,8 @@ export default function Home() {
   const [toastMessage, setToastMessage] = useState('');
   const [selectedDevProfile, setSelectedDevProfile] = useState(null);
 
+  
+
   // Handle Load More
   const handleLoadMore = () => {
     setLoadingMore(true);
@@ -170,11 +172,11 @@ export default function Home() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <Header
+        {/* <Header
           onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-        />
+        /> */}
 
         {/* Network Body / Page Container */}
         <main className="flex-1 p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto overflow-y-auto">
