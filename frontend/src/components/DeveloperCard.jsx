@@ -15,6 +15,8 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
     }, 600);
   };
 
+  console.log("skill[0]", developer.skills[0])
+
   return (
     <div className="bg-[#12181f] border border-[#202932] hover:border-[#334250] rounded-lg p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)] group relative">
       {/* Top Section: Avatar, Name, Title, and Role Badge */}
@@ -22,7 +24,7 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3">
             <img
-              src={developer.avatar}
+              src={developer.photoURL}
               alt={developer.name}
               className="w-12 h-12 rounded-lg object-cover border border-[#2c3744] shadow-sm flex-shrink-0"
               onError={(e) => {
@@ -32,17 +34,17 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
             />
             <div>
               <h3 className="font-bold text-[#dde4dd] text-[15px] leading-snug group-hover:text-[#4edea3] transition-colors">
-                {developer.name}
+                {developer.firstName + " " + developer.lastName} 
               </h3>
               <p className="text-xs font-mono-code text-[#7e8e83] mt-0.5">
-                {developer.title}
+                {developer.skills[0]}
               </p>
             </div>
           </div>
 
           {/* Role Badge */}
           <span className="text-[11px] font-mono-code px-2 py-0.5 rounded bg-[#182029] border border-[#2c3744] text-[#9fb0a5] tracking-wide flex-shrink-0">
-            {developer.role}
+            {developer.skills[0]}
           </span>
         </div>
 
@@ -77,7 +79,7 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
         <div className="bg-[#0b1015] border border-[#1e2833] rounded-md px-3 py-2 flex items-center justify-between text-xs font-mono-code">
           <div className="flex items-center gap-2 text-[#c2d0c6] truncate mr-2">
             <span className="text-sm">{developer.goalIcon}</span>
-            <span className="truncate">{developer.goalText}</span>
+            <span className="truncate">{developer.skills[1]}</span>
           </div>
           {developer.hasLiveDot && (
             <span className="relative flex h-2 w-2 flex-shrink-0">
@@ -111,15 +113,15 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
                 <span className="material-symbols-outlined text-xs animate-spin">
                   progress_activity
                 </span>
-                <span>Connecting...</span>
+                <span>Chat</span>
               </>
             ) : connected ? (
               <>
                 <span className="material-symbols-outlined text-xs">done</span>
-                <span>Connected</span>
+                <span>Chat</span>
               </>
             ) : (
-              <span>Connect</span>
+              <span>Chat</span>
             )}
           </button>
         </div>

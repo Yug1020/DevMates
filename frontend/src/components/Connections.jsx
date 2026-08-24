@@ -1,7 +1,9 @@
-import { useState, useMemo } from 'react';
-import Sidebar from './Sidebar';
-import Header from './Header';
+import { useState, useMemo, useEffect } from 'react';
 import DeveloperCard from './DeveloperCard';
+import { API_BASE_URL } from "../util/constant";
+import axios from "axios";
+import { useDispatch } from 'react-redux';
+import { setNetworkList } from '../store/connectionSlice';
 
 const INITIAL_DEVELOPERS = [
   {
@@ -45,65 +47,72 @@ const INITIAL_DEVELOPERS = [
   },
 ];
 
-const MORE_DEVELOPERS = [
-  {
-    id: 4,
-    name: 'Elena Rostova',
-    title: 'ML & AI Researcher',
-    role: 'AI / ML',
-    avatar:
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&q=80',
-    bio: 'Building autonomous LLM agents and high-throughput embedding inference pipelines. Interested in open-source AI projects.',
-    skills: ['Python', 'PyTorch', 'LangChain'],
-    goalIcon: '🧠',
-    goalText: 'AI Research Collab',
-    hasLiveDot: true,
-  },
-  {
-    id: 5,
-    name: 'Marcus Sterling',
-    title: 'Cloud Infrastructure Architect',
-    role: 'DevOps',
-    avatar:
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80',
-    bio: 'Automating multi-cloud architectures with Terraform and GitOps. Looking to mentor developers on Kubernetes and zero-downtime CI/CD.',
-    skills: ['AWS', 'Terraform', 'Docker'],
-    goalIcon: '🚀',
-    goalText: 'Cloud Architecture',
-    hasLiveDot: true,
-  },
-  {
-    id: 6,
-    name: 'Maya Patel',
-    title: 'Senior Mobile Engineer',
-    role: 'Frontend',
-    avatar:
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=256&q=80',
-    bio: 'Crafting responsive mobile applications with smooth 60fps micro-interactions and offline-first database synchronization.',
-    skills: ['React', 'Flutter', 'Swift'],
-    goalIcon: '📱',
-    goalText: 'Pair Programming',
-    hasLiveDot: false,
-  },
-];
+// const MORE_DEVELOPERS = [
+//   {
+//     id: 4,
+//     name: 'Elena Rostova',
+//     title: 'ML & AI Researcher',
+//     role: 'AI / ML',
+//     avatar:
+//       'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&q=80',
+//     bio: 'Building autonomous LLM agents and high-throughput embedding inference pipelines. Interested in open-source AI projects.',
+//     skills: ['Python', 'PyTorch', 'LangChain'],
+//     goalIcon: '🧠',
+//     goalText: 'AI Research Collab',
+//     hasLiveDot: true,
+//   },
+//   {
+//     id: 5,
+//     name: 'Marcus Sterling',
+//     title: 'Cloud Infrastructure Architect',
+//     role: 'DevOps',
+//     avatar:
+//       'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80',
+//     bio: 'Automating multi-cloud architectures with Terraform and GitOps. Looking to mentor developers on Kubernetes and zero-downtime CI/CD.',
+//     skills: ['AWS', 'Terraform', 'Docker'],
+//     goalIcon: '🚀',
+//     goalText: 'Cloud Architecture',
+//     hasLiveDot: true,
+//   },
+//   {
+//     id: 6,
+//     name: 'Maya Patel',
+//     title: 'Senior Mobile Engineer',
+//     role: 'Frontend',
+//     avatar:
+//       'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=256&q=80',
+//     bio: 'Crafting responsive mobile applications with smooth 60fps micro-interactions and offline-first database synchronization.',
+//     skills: ['React', 'Flutter', 'Swift'],
+//     goalIcon: '📱',
+//     goalText: 'Pair Programming',
+//     hasLiveDot: false,
+//   },
+// ];
 
 export default function Connections() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('All Roles');
   const [selectedSkill, setSelectedSkill] = useState('All Skills');
-  const [developers, setDevelopers] = useState(INITIAL_DEVELOPERS);
+  const [developers, setDevelopers] = useState(INITIAL_DEVELOPERS); //INITIAL_DEVELOPERS
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [selectedDevProfile, setSelectedDevProfile] = useState(null);
+  const dispatch = useDispatch();
 
-  
+  // const network = async() => {
+  //   await axios
+  //   .get(API_BASE_URL + "/connections/list", {withCredentials: true})
+  //   .then((res) =>  dispatch(setNetworkList(res?.data)))
+  //   .catch((err) => {err})
+  // }
+  console.log("dev", developers)
 
   // Handle Load More
   const handleLoadMore = () => {
     setLoadingMore(true);
     setTimeout(() => {
-      setDevelopers((prev) => [...prev, ...MORE_DEVELOPERS]);
+      setDevelopers((prev) => [...prev, ...developers]);
       setHasLoadedMore(true);
       setLoadingMore(false);
     }, 600);
@@ -160,6 +169,13 @@ export default function Connections() {
     });
   }, [developers, selectedRole, selectedSkill, searchQuery]);
 
+  useEffect(() => {
+    axios
+    .get(API_BASE_URL + "/connections/list", {withCredentials: true})
+    .then((res) => setDevelopers(res?.data)) //dispatch(setNetworkList(res?.data))
+    .catch((err) => {err})
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#0a0e13] text-[#dde4dd] flex font-body-sm selection:bg-[#4edea3]/20 selection:text-[#4edea3]">
       {/* Left Sidebar */}
@@ -167,12 +183,6 @@ export default function Connections() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header */}
-        {/* <Header
-          onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        /> */}
 
         {/* Network Body / Page Container */}
         <main className="flex-1 p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto overflow-y-auto">
@@ -180,10 +190,10 @@ export default function Connections() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold font-headline-lg text-[#dde4dd] tracking-tight">
-                Discover Developers
+                Developers Network
               </h1>
               <p className="text-xs sm:text-sm font-mono-code text-[#7e8e83] mt-1.5">
-                Find and connect with developers matching your stack and goals.
+                Find and chat with developers matching your stack and goals.
               </p>
             </div>
 
@@ -291,9 +301,9 @@ export default function Connections() {
           )}
 
           {/* Load More Section */}
-          {!hasLoadedMore && (
+          {/* {!hasLoadedMore && (
             <div className="flex items-center justify-center gap-4 text-xs font-mono-code text-[#7e8e83] py-10">
-              <span className="w-16 h-[1px] bg-[#1e2630]" />
+              <span className="w-16 h-px bg-[#1e2630]" />
               <button
                 type="button"
                 onClick={handleLoadMore}
@@ -311,9 +321,9 @@ export default function Connections() {
                   <span>Load More Developers</span>
                 )}
               </button>
-              <span className="w-16 h-[1px] bg-[#1e2630]" />
+              <span className="w-16 h-px bg-[#1e2630]" />
             </div>
-          )}
+          )} */}
         </main>
       </div>
 
@@ -324,22 +334,22 @@ export default function Connections() {
           onClick={() => setSelectedDevProfile(null)}
         >
           <div
-            className="w-full max-w-lg bg-[#12181f] border border-[#2c3744] rounded-xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+            className="w-full max-w-4/12 bg-[#12181f] border border-[#2c3744] rounded-xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between pb-4 border-b border-[#1e2630] mb-4">
               <div className="flex items-center gap-3">
                 <img
-                  src={selectedDevProfile.avatar}
+                  src={selectedDevProfile.photoURL}
                   alt={selectedDevProfile.name}
                   className="w-14 h-14 rounded-xl object-cover border border-[#2c3744]"
                 />
                 <div>
                   <h2 className="text-lg font-bold text-[#dde4dd]">
-                    {selectedDevProfile.name}
+                    {selectedDevProfile.firstName + " " + selectedDevProfile.lastName}
                   </h2>
                   <p className="text-xs font-mono-code text-[#7e8e83]">
-                    {selectedDevProfile.title}
+                    {selectedDevProfile.skills[0]}
                   </p>
                 </div>
               </div>
@@ -378,7 +388,7 @@ export default function Connections() {
                 <span className="text-[#7e8e83] block mb-1">Current Goal</span>
                 <div className="bg-[#0b1015] border border-[#1e2833] rounded-md px-3 py-2 flex items-center gap-2 text-[#dde4dd]">
                   <span>{selectedDevProfile.goalIcon}</span>
-                  <span>{selectedDevProfile.goalText}</span>
+                  <span>{selectedDevProfile.skills[1]}</span>
                 </div>
               </div>
             </div>
@@ -399,7 +409,7 @@ export default function Connections() {
                 }}
                 className="px-4 py-2 text-xs font-mono-code font-bold bg-[#4edea3] hover:bg-[#6ffbbe] text-[#000000] rounded transition-colors"
               >
-                Connect
+                Chat
               </button>
             </div>
           </div>

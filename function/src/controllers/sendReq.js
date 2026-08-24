@@ -3,7 +3,7 @@ import { ConnectionRequest } from "../models/connectionRequest.js";
 import { User } from "../models/user.js";
 
 
-const USER_INFO = ["firstName", "lastName", "email", "gender", "age", "phone", "skills"]
+const USER_INFO = ["firstName", "lastName", "email", "gender", "age", "phone", "photoURL", "skills"]
 
 export const sendReq = async(req, res) => {
     try{
