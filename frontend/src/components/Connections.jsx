@@ -191,7 +191,7 @@ export default function Connections() {
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold font-headline-lg text-[#dde4dd] tracking-tight">
                 Developers Network
-              </h1>
+              </h1>``
               <p className="text-xs sm:text-sm font-mono-code text-[#7e8e83] mt-1.5">
                 Find and chat with developers matching your stack and goals.
               </p>
