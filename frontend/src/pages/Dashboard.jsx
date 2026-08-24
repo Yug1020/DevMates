@@ -1,21 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
-import Home from '../components/Home';
-import Connections from '../components/Connections';
-import Profile from '../components/Profile';
-import Error from '../components/Error';
-import { Outlet, Routes, Route, Navigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import { Outlet } from 'react-router-dom';
 
 const Dashboard = () => {
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
     return (
         <div>
+            {/* Layout stays consistent across sub-pages */}
             <Header />
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="network" element={<Connections />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="*" element={<Error />} />
-            </Routes>
+            <Sidebar
+              mobileOpen={mobileSidebarOpen}
+              onCloseMobile={() => setMobileSidebarOpen(false)}
+            />
+            
+            {/* Dynamic pages content slots here */}
+            <main className="lg:ml-[15.25rem]">
+                <Outlet />
+            </main>
         </div>
     );
 };

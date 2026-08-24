@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, replace, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../store/userSlice';
@@ -11,17 +11,21 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const userInfo = useSelector((state) => state.user);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  {
-    if(userInfo){
-      navigate("/")
+  
+  const userInfo = async() => {
+    try{
+      const res = await axios.get(API_BASE_URL + "/verify", {withCredentials: true})
+      if(res.status === 200){
+        return navigate("/", {replace:true})
+      }
+    }
+    catch(err){
+      console.log("Unauthorized user:- ", err)
     }
   }
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -56,6 +60,10 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  useEffect(()=> {
+    userInfo()
+  },[])
 
   return (
     <div className="min-h-screen flex w-full bg-[#090b0e] text-zinc-100 font-sans">
