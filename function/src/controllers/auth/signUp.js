@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import { User } from "../models/user.js";
+import { User } from "../../models/user.js";
 import isStrongPassword from "validator/lib/isStrongPassword.js";
 import isEmail from "validator/lib/isEmail.js";
 import bcrypt, { hash } from "bcrypt";

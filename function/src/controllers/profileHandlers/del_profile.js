@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { User } from "../models/user.js";
+import { User } from "../../models/user.js";
 
 export const del_profile = async (req, res) => {
     const query = req.user;

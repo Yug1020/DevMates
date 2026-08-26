@@ -2,10 +2,10 @@ import { useState, useMemo, useEffect } from 'react';
 import DeveloperCard from './DeveloperCard';
 import { API_BASE_URL } from "../util/constant";
 import axios from "axios";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setNetworkList } from '../store/connectionSlice';
 
-const INITIAL_DEVELOPERS = [
+/* const INITIAL_DEVELOPERS = [
   {
     id: 1,
     name: 'Alex Chen',
@@ -45,7 +45,7 @@ const INITIAL_DEVELOPERS = [
     goalText: 'Pair Programming',
     hasLiveDot: true,
   },
-];
+]; */
 
 // const MORE_DEVELOPERS = [
 //   {
@@ -93,34 +93,15 @@ export default function Connections() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('All Roles');
   const [selectedSkill, setSelectedSkill] = useState('All Skills');
-  const [developers, setDevelopers] = useState(INITIAL_DEVELOPERS); //INITIAL_DEVELOPERS
-  const [hasLoadedMore, setHasLoadedMore] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [selectedDevProfile, setSelectedDevProfile] = useState(null);
   const dispatch = useDispatch();
-
-  // const network = async() => {
-  //   await axios
-  //   .get(API_BASE_URL + "/connections/list", {withCredentials: true})
-  //   .then((res) =>  dispatch(setNetworkList(res?.data)))
-  //   .catch((err) => {err})
-  // }
-  console.log("dev", developers)
-
-  // Handle Load More
-  const handleLoadMore = () => {
-    setLoadingMore(true);
-    setTimeout(() => {
-      setDevelopers((prev) => [...prev, ...developers]);
-      setHasLoadedMore(true);
-      setLoadingMore(false);
-    }, 600);
-  };
+  const networkList = useSelector((state) => state.connections);
 
   // Handle Connection Request Feedback
   const handleConnect = (dev) => {
-    setToastMessage(`Connection request sent to ${dev.name}!`);
+    const name = `${dev.firstName || ''} ${dev.lastName || ''}`.trim() || 'developer';
+    setToastMessage(`Connection request sent to ${name}!`);
     setTimeout(() => {
       setToastMessage('');
     }, 3500);
@@ -128,17 +109,17 @@ export default function Connections() {
 
   // Filter developers based on search, role, skill
   const filteredDevelopers = useMemo(() => {
-    return developers.filter((dev) => {
+    return networkList.filter((dev) => {
       // Role filter
       if (selectedRole !== 'All Roles') {
-        if (dev.role.toLowerCase() !== selectedRole.toLowerCase()) {
+        if ((dev.role || dev.skills?.[0] || '').toLowerCase() !== selectedRole.toLowerCase()) {
           return false;
         }
       }
 
       // Skill filter
       if (selectedSkill !== 'All Skills') {
-        const hasSkill = dev.skills.some(
+        const hasSkill = (dev.skills || []).some(
           (s) => s.toLowerCase() === selectedSkill.toLowerCase()
         );
         if (!hasSkill) return false;
@@ -147,13 +128,14 @@ export default function Connections() {
       // Search query filter
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
-        const matchesName = dev.name.toLowerCase().includes(query);
-        const matchesTitle = dev.title.toLowerCase().includes(query);
-        const matchesBio = dev.bio.toLowerCase().includes(query);
-        const matchesSkills = dev.skills.some((s) =>
+        const name = `${dev.firstName || ''} ${dev.lastName || ''}`.trim();
+        const matchesName = name.toLowerCase().includes(query);
+        const matchesTitle = (dev.title || '').toLowerCase().includes(query);
+        const matchesBio = (dev.bio || '').toLowerCase().includes(query);
+        const matchesSkills = (dev.skills || []).some((s) =>
           s.toLowerCase().includes(query)
         );
-        const matchesRole = dev.role.toLowerCase().includes(query);
+        const matchesRole = (dev.role || '').toLowerCase().includes(query);
         if (
           !matchesName &&
           !matchesTitle &&
@@ -167,14 +149,24 @@ export default function Connections() {
 
       return true;
     });
-  }, [developers, selectedRole, selectedSkill, searchQuery]);
+  }, [networkList, selectedRole, selectedSkill, searchQuery]);
 
   useEffect(() => {
+    let isMounted = true;
+
     axios
-    .get(API_BASE_URL + "/connections/list", {withCredentials: true})
-    .then((res) => setDevelopers(res?.data)) //dispatch(setNetworkList(res?.data))
-    .catch((err) => {err})
-  }, [])
+      .get(API_BASE_URL + "/connections/list", { withCredentials: true })
+      .then((res) => {
+        if (isMounted) dispatch(setNetworkList(res.data));
+      })
+      .catch(() => {
+        if (isMounted) dispatch(setNetworkList([]));
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen bg-[#0a0e13] text-[#dde4dd] flex font-body-sm selection:bg-[#4edea3]/20 selection:text-[#4edea3]">
@@ -191,7 +183,7 @@ export default function Connections() {
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold font-headline-lg text-[#dde4dd] tracking-tight">
                 Developers Network
-              </h1>``
+              </h1>
               <p className="text-xs sm:text-sm font-mono-code text-[#7e8e83] mt-1.5">
                 Find and chat with developers matching your stack and goals.
               </p>
@@ -271,7 +263,7 @@ export default function Connections() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredDevelopers.map((dev) => (
                 <DeveloperCard
-                  key={dev.id}
+                  key={dev._id}
                   developer={dev}
                   onConnect={handleConnect}
                   onViewProfile={(d) => setSelectedDevProfile(d)}
@@ -334,7 +326,7 @@ export default function Connections() {
           onClick={() => setSelectedDevProfile(null)}
         >
           <div
-            className="w-full max-w-4/12 bg-[#12181f] border border-[#2c3744] rounded-xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+            className="w-full max-w-3/12 bg-[#12181f] border border-[#2c3744] rounded-xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between pb-4 border-b border-[#1e2630] mb-4">

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { User } from "../models/user.js";
+import { User } from "../../models/user.js";
 
 export const update = async(req, res) => {
     const editable = ["streetName", "phone", "photoURL", "skills"]

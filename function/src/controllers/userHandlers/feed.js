@@ -1,6 +1,6 @@
-import { User } from "../models/user.js";
+import { User } from "../../models/user.js";
 import mongoose from "mongoose";
-import { ConnectionRequest } from "../models/connectionRequest.js";
+import { ConnectionRequest } from "../../models/connectionRequest.js";
 
 export const feed = async(req, res) => {
     const USER_INFO = ["firstName", "lastName", "email", "gender", "age", "phone", "skills"]

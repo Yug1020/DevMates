@@ -1,16 +1,15 @@
-import React from "react";
 import { createSlice } from "@reduxjs/toolkit";
 
 const connectionSlice = createSlice(
     {
-        name:"Connections",
-        initialState:{},
+        name:"connections",
+        initialState: [],
         reducers:{
             setNetworkList:(state, action) => {
-                return action.payload
+                return Array.isArray(action.payload) ? action.payload : []
             },
             resetNetworkList:() => {
-                return null
+                return []
             }
         }
     }

@@ -31,7 +31,7 @@ const ProtectedRoutes = () => {
     // 3. Show loader while checking credentials on refresh
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+            <div className='flex items-center justify-center min-h-100vh'>
                 <span>Loading...</span>
             </div>
         );

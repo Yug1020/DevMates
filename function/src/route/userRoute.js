@@ -1,5 +1,5 @@
 import express from "express";
-import { feed } from "../controllers/feed.js";
+import { feed } from "../controllers/userHandlers/feed.js";
 import { authHandler } from "../middlewares/authHandler.js"
 
 export const userRoute = express.Router();

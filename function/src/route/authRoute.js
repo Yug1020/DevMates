@@ -1,9 +1,9 @@
 import express from "express";
-import { signUp } from "../controllers/signUp.js";
-import { login } from "../controllers/login.js";
+import { signUp } from "../controllers/auth/signUp.js";
+import { login } from "../controllers/auth/login.js";
+import { logout } from "../controllers/auth/logout.js";
+import { verify } from "../controllers/auth/verify.js";
 import { authHandler } from "../middlewares/authHandler.js";
-import { logout } from "../controllers/logout.js";
-import { verify } from "../controllers/verify.js";
 
 export const authRoute = express.Router()
 

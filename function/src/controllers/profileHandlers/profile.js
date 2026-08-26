@@ -1,6 +1,6 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import { User } from "../models/user.js";
+import { User } from "../../models/user.js";
 
 export const profile = async(req, res) => {
     try{

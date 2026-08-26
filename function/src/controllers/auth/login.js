@@ -1,4 +1,4 @@
-import { User } from "../models/user.js";
+import { User } from "../../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import * as cookie from "cookie";
@@ -9,12 +9,13 @@ export const login = async (req, res) => {
     const {email, password} = req.body;
     try{
         const isMail = await User.findOne({email});
-        const filteredUserInfo = { firstName: isMail.firstName, lastName: isMail.lastName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, photoURL: isMail.photoURL, skills: isMail.skills }  
         // console.log("filteredUserInfo", filteredUserInfo)
 
         if(!isMail){
             return res.status(404).send("Invalid credentials")
         }
+
+        const filteredUserInfo = { firstName: isMail.firstName, lastName: isMail.lastName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, photoURL: isMail.photoURL, skills: isMail.skills }
         
         //Mongoose method of password verification
         const match = await isMail.verifyPassword(password)
@@ -32,8 +33,8 @@ export const login = async (req, res) => {
             const cookie = res.cookie("auth_token", isMail.generateAuthtoken(), // isMail.generateAuthtoken() is the way to generate user token using mongoose methods
                 {
                     httpOnly: true, //Prevents client-side JS from reading the cookie
-                    secure: true,   //Ensures the cookie is only sent over HTTPS (useful for production)
-                    maxAge: 7 * 86400 //7 days of expire time (3 hrs * 86400(sec in a day))  
+                    secure: true,   //Ensures the cookie is only sent over HTTPS (useful for production)                    
+                    maxAge: 7 * 24 * 60 * 60 * 1000 //7 days of expire time   
                 }
             )
             return res.send(filteredUserInfo)

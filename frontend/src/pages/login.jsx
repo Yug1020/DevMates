@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, replace, useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setUser } from '../store/userSlice';
 import { API_BASE_URL } from '../util/constant';
 import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';

@@ -3,6 +3,8 @@ import { useState } from 'react';
 export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
   const [connected, setConnected] = useState(developer.isConnected || false);
   const [connecting, setConnecting] = useState(false);
+  const displayName = `${developer.firstName || ''} ${developer.lastName || ''}`.trim() || 'Developer';
+  const skills = developer.skills || [];
 
   const handleConnectClick = (e) => {
     e.stopPropagation();
@@ -15,7 +17,6 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
     }, 600);
   };
 
-  console.log("skill[0]", developer.skills[0])
 
   return (
     <div className="bg-[#12181f] border border-[#202932] hover:border-[#334250] rounded-lg p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-[0_4px_24px_rgba(0,0,0,0.5)] group relative">
@@ -25,7 +26,7 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
           <div className="flex items-center gap-3">
             <img
               src={developer.photoURL}
-              alt={developer.name}
+              alt={displayName}
               className="w-12 h-12 rounded-lg object-cover border border-[#2c3744] shadow-sm flex-shrink-0"
               onError={(e) => {
                 e.target.src =
@@ -34,28 +35,28 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
             />
             <div>
               <h3 className="font-bold text-[#dde4dd] text-[15px] leading-snug group-hover:text-[#4edea3] transition-colors">
-                {developer.firstName + " " + developer.lastName} 
+                {displayName}
               </h3>
               <p className="text-xs font-mono-code text-[#7e8e83] mt-0.5">
-                {developer.skills[0]}
+                {skills[0] || 'Developer'}
               </p>
             </div>
           </div>
 
           {/* Role Badge */}
           <span className="text-[11px] font-mono-code px-2 py-0.5 rounded bg-[#182029] border border-[#2c3744] text-[#9fb0a5] tracking-wide flex-shrink-0">
-            {developer.skills[0]}
+            {skills[0] || 'Developer'}
           </span>
         </div>
 
         {/* Bio Text */}
         <p className="text-xs font-body-sm text-[#8a9990] line-clamp-3 leading-relaxed mb-4 min-h-[50px]">
-          {developer.bio}
+          {developer.bio || 'Open to connecting with developers in the network.'}
         </p>
 
         {/* Tech Stack Badges */}
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {developer.skills.map((skill, index) => {
+          {skills.map((skill, index) => {
             const isPrimary = index === 0;
             return (
               <span
@@ -78,8 +79,8 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
         {/* Goal / Availability Box */}
         <div className="bg-[#0b1015] border border-[#1e2833] rounded-md px-3 py-2 flex items-center justify-between text-xs font-mono-code">
           <div className="flex items-center gap-2 text-[#c2d0c6] truncate mr-2">
-            <span className="text-sm">{developer.goalIcon}</span>
-            <span className="truncate">{developer.skills[1]}</span>
+            <span className="text-sm">{developer.goalIcon || '🤝'}</span>
+            <span className="truncate">{developer.goalText || skills[1] || 'Developer connection'}</span>
           </div>
           {developer.hasLiveDot && (
             <span className="relative flex h-2 w-2 flex-shrink-0">

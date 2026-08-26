@@ -24,15 +24,30 @@ const userSchema = new mongoose.Schema(
             type:[String], 
             minlength:1, 
             set:(incomingArray) => {return [...new Set(incomingArray)]} //remove duplicate
-        } 
-    },
-    {timestamps:true}
+        },
+        createdAt: { type: Date, default: () => 
+          {
+            const now = new Date();
+            // Add 5.5 hours in milliseconds (5.5 * 60 * 60 * 1000)
+            const istOffset = 5.5 * 60 * 60 * 1000; 
+            return new Date(now.getTime() + istOffset);
+          }
+        },
+        updatedAt: { type: Date, default: () => 
+          {
+            const now = new Date();
+            // Add 5.5 hours in milliseconds (5.5 * 60 * 60 * 1000)
+            const istOffset = 5.5 * 60 * 60 * 1000; 
+            return new Date(now.getTime() + istOffset);
+          }
+        }              
+    }
 )
 
 
 userSchema.methods.generateAuthtoken = function() {
     const payload = {user_id : this._id}
-    const token = jwt.sign(payload , process.env.secretKey, {expiresIn: "1hr"})
+    const token = jwt.sign(payload , process.env.secretKey, {expiresIn: "168h"})
     return token;
 }
 
