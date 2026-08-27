@@ -187,7 +187,7 @@ const filteredDevelopers = useMemo(() => {
 useEffect(() => {
     axios
         .get(API_BASE_URL + "/user/feed", { withCredentials: true })
-        .then((res) => { setDevelopersList(res.data), console.log("res", res) })
+        .then((res) => { setDevelopersList(res.data)})
 }, [])
 
 return (

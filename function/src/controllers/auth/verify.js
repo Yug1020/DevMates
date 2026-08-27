@@ -3,7 +3,6 @@ import express from "express";
 export const verify = async(req, res) => {
     try{
         const userData = req.user
-        console.log(userData)
         if (userData){
             res.status(200).send("verified")
         }

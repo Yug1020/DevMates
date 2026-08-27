@@ -3,17 +3,27 @@ import { User } from "../../models/user.js";
 
 export const del_profile = async (req, res) => {
     const query = req.user;
-    console.log(query)
+    const password = req.body.password;
     try {
+        const passwordVerification = await query.verifyPassword(password)
+        //Above verifyPassword function is defined in User schema model
+
+        if(!passwordVerification){
+            return res.status(401).send("Invalid password")
+        }
+
         const deleted = await User.findOneAndDelete(query);
-        console.log(deleted)
-        if(deleted === null){
-            res.status(404).send("User not found") 
+        if(!deleted){
+            return res.status(404).send("User not found")
         }else{
-            console.log(deleted)
-            res.send("successfully deleted user profile")
+            // Deleting the account also invalidates the current login session.
+            res.clearCookie("auth_token", {
+                httpOnly: true,
+                secure: true,
+            });
+            return res.send("successfully deleted user profile")
         }
     } catch (error) {
-        res.status(500).send("Something went wrong");
+        return res.status(500).send("Something went wrong");
     }
 }

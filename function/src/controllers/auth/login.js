@@ -15,7 +15,7 @@ export const login = async (req, res) => {
             return res.status(404).send("Invalid credentials")
         }
 
-        const filteredUserInfo = { firstName: isMail.firstName, lastName: isMail.lastName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, photoURL: isMail.photoURL, skills: isMail.skills }
+        const filteredUserInfo = { firstName: isMail.firstName, lastName: isMail.lastName, streetName:isMail.streetName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, photoURL: isMail.photoURL, skills: isMail.skills }
         
         //Mongoose method of password verification
         const match = await isMail.verifyPassword(password)
@@ -34,7 +34,7 @@ export const login = async (req, res) => {
                 {
                     httpOnly: true, //Prevents client-side JS from reading the cookie
                     secure: true,   //Ensures the cookie is only sent over HTTPS (useful for production)                    
-                    maxAge: 7 * 24 * 60 * 60 * 1000 //7 days of expire time   
+                    maxAge: 24 * 60 * 60 * 1000 //24 hours of expire time   
                 }
             )
             return res.send(filteredUserInfo)

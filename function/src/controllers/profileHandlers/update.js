@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { User } from "../../models/user.js";
 
 export const update = async(req, res) => {
-    const editable = ["streetName", "phone", "photoURL", "skills"]
+    const editable = ["streetName", "phone", "photoURL", "skills", "bio"]
     try {
         const query = req.user
         const changes = req.body
@@ -10,7 +10,7 @@ export const update = async(req, res) => {
         const isValid = Object.keys(changes).every(item => editable.includes(item))
 
         if(!(isValid)){
-            return res.send("selected field is not allowed to update")
+            return res.status(400).send("selected field is not allowed to update")
         }
 
         if(!query){
@@ -18,10 +18,10 @@ export const update = async(req, res) => {
         }else{
             const updated_doc = await User.findByIdAndUpdate(query, changes, {returnDocument: "before"})
             await console.log(updated_doc)
-            res.send("Successfully upgraded user profile")
+            return res.status(200).send("Successfully upgraded user profile")
         }
 
     } catch(error){
-        res.send("Something went wrong " + error.message)
+        return res.status(500).send("Something went wrong " + error.message)
     }
 }
