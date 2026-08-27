@@ -112,7 +112,7 @@ export default function Requests() {
 
   const takeBackReq = (id) => {
     axios
-    .post(API_BASE_URL + "/connections/send/ignore/" + id, {}, {withCredentials: true})
+    .post(API_BASE_URL + "/connections/send/pass/" + id, {}, {withCredentials: true})
     .then(setOutbound((requests) => requests.filter((request) => request.id !== id)))
     .catch((err) => {console.log(err)})
   }

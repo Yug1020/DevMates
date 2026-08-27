@@ -61,11 +61,10 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
             return (
               <span
                 key={skill}
-                className={`text-[11px] font-mono-code px-2.5 py-1 rounded border transition-colors ${
-                  isPrimary
+                className={`text-[11px] font-mono-code px-2.5 py-1 rounded border transition-colors ${isPrimary
                     ? 'bg-[#102a20] border-[#4edea3]/40 text-[#4edea3]'
                     : 'bg-[#161e27] border-[#263340] text-[#9fb0a5]'
-                }`}
+                  }`}
               >
                 {skill}
               </span>
@@ -103,11 +102,10 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
             type="button"
             onClick={handleConnectClick}
             disabled={connected || connecting}
-            className={`flex-1 py-1.5 px-3 text-xs font-mono-code font-semibold rounded border transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
-              connected
+            className={`flex-1 py-1.5 px-3 text-xs font-mono-code font-semibold rounded border transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${connected
                 ? 'bg-[#102a20] border-[#4edea3]/50 text-[#4edea3] cursor-default'
                 : 'bg-[#0f241c]/70 border-[#2b5a45] text-[#4edea3] hover:bg-[#4edea3] hover:text-[#000000] hover:border-[#4edea3]'
-            }`}
+              }`}
           >
             {connecting ? (
               <>

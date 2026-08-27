@@ -6,7 +6,7 @@ const connectionRequestSchema = new mongoose.Schema(
   {
     fromRequest: { type: mongoose.ObjectId , ref:"User"},
     toRequest: { type: mongoose.ObjectId, ref:"User" },
-    sentStatus: { type: String, enum:{ values:["pass", "connect", "ignored"]}},
+    sentStatus: { type: String, enum:{ values:["pass","connect", "ignore"]}},
     receivedStatus: {type: String, enum:{ values:[ "pending", "accept", "reject"] }, default:"pending" },
     createdAt: { type: Date, default: () => 
       {
