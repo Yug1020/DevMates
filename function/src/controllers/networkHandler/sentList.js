@@ -12,8 +12,8 @@ export const sentList = async(req, res) => {
         if(!cursor){
             return res.send("No data found")
         }
-        console.log("cursor", cursor)
-        const receiver = cursor.map(
+
+        const receiver = cursor.filter((item) => item.toRequest !== null).map(
             (item) => ({
                 ...item.toRequest._doc,
                 createdAt: item.createdAt,
