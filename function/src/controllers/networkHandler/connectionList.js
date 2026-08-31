@@ -15,7 +15,7 @@ export const connectionList = async(req, res) => {
         if (!reqExist){
             throw new Error(error)
         }
-        console.log(reqExist)
+
         const data = reqExist.map((row) => {
             const fromIdString = row.fromRequest._id.toString();
             const loggedInString = loggedInUser.toString();
@@ -26,7 +26,7 @@ export const connectionList = async(req, res) => {
                 return row.fromRequest;
             }
         });
-        console.log(data)
+
         res.send(data)
     } catch (error) {
         res.status(400).send("Something is wrong")

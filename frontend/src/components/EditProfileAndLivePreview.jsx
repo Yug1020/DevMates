@@ -112,7 +112,6 @@ export default function EditProfileAndLivePreview({ onToast }) {
 const handleSaveChanges = async (e) => { // 1. Add 'async' to the function definition
   e.preventDefault();
 
-  console.log()
 
   try {
     // 2. Tell JavaScript to pause here and 'await' the API response

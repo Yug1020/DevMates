@@ -9,7 +9,6 @@ export const login = async (req, res) => {
     const {email, password} = req.body;
     try{
         const isMail = await User.findOne({email});
-        // console.log("filteredUserInfo", filteredUserInfo)
 
         if(!isMail){
             return res.status(404).send("Invalid credentials")

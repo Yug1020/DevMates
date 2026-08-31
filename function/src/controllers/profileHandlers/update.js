@@ -17,7 +17,6 @@ export const update = async(req, res) => {
             return res.status(404).send("User doesn't exist")
         }else{
             const updated_doc = await User.findByIdAndUpdate(query, changes, {returnDocument: "before"})
-            await console.log(updated_doc)
             return res.status(200).send("Successfully upgraded user profile")
         }
 

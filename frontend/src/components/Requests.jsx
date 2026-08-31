@@ -127,7 +127,7 @@ export default function Requests() {
       if(activeTab === "sent"){
         axios
         .get(API_BASE_URL + "/connections/sentList", {withCredentials: true})
-        .then((res) => {setOutbound(res?.data), console.log(res?.data)})
+        .then((res) => {setOutbound(res?.data)})
         .catch((err) => {console.log(err)})
       }    
   },[activeTab])
