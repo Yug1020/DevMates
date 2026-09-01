@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { User } from "../../models/user.js";
+import { ConnectionRequest } from "../../models/connectionRequest.js";
 
 export const del_profile = async (req, res) => {
     const query = req.user;
@@ -11,6 +12,8 @@ export const del_profile = async (req, res) => {
         if(!passwordVerification){
             return res.status(401).send("Invalid password")
         }
+
+        await ConnectionRequest.deleteMany({$or:[{ fromRequest:query._id }, { toRequest:query._id }]})
 
         const deleted = await User.findOneAndDelete(query);
         if(!deleted){
