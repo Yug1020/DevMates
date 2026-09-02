@@ -179,10 +179,10 @@ export default function SignUp() {
   };
 
   return (
-    <div className="h-[100vh] min-h-[100vh] flex w-full bg-[#0D1117] text-[#dde4dd] overflow-y-hidden">
+    <div className="h-screen w-full flex bg-[#0D1117] text-[#dde4dd] overflow-hidden">
       {/* Left Side: Brand Anchoring / Terminal Slogans */}
       <div
-        className=" lg:flex lg:w-5/12 relative bg-cover bg-center bg-no-repeat border-r border-[#242c27] flex-col justify-between p-10 select-none min-h-full"
+        className="hidden lg:flex lg:w-5/12 relative bg-cover bg-center bg-no-repeat border-r border-[#242c27] flex-col justify-between p-10 select-none h-full"
         style={{
           backgroundImage:
             "url('https://rocm.blogs.amd.com/artificial-intelligence/hipDF_pandas_accelerated/README.html')",
@@ -221,11 +221,14 @@ export default function SignUp() {
       </div>
 
       {/* Right Side: Registration / Create Account Form */}
-      <div className="w-full lg:w-7/12 flex items-center justify-center p-4  sm:p-8 md:p-12 min-h-full">
-        <div className="w-full  max-w-10/12  bg-[#161d19] border border-[#242c27] rounded-lg p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.6)] mt-3 mb-3 relative">
+      <div className="w-full lg:w-7/12 flex items-start lg:items-center justify-center px-4 py-8 sm:px-8 sm:py-10 md:px-12 md:py-12 h-full overflow-y-auto">
+        <div className="w-full bg-[#161d19] border border-[#242c27] rounded-xl p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.6)] my-auto relative">
           {/* Header Row: Title on Left, Avatar Popover Trigger on Right */}
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
+              <div className="text-xl sm:text-2xl font-bold text-[#dde4dd] tracking-tight">
+                DevMates
+              </div>
               <h1 className="text-2xl sm:text-3xl font-bold font-headline-lg text-[#dde4dd]">
                 Create Account
               </h1>
@@ -492,9 +495,11 @@ export default function SignUp() {
                   }}
                   className="w-full px-3 py-2 text-sm font-mono-code rounded border border-[#30363D] bg-[#0D1117] text-[#dde4dd] placeholder-[#4a554f]"
                 />
-                <p className="mt-1 text-[11px] font-mono-code text-[#fc7c78]/80">
-                  phone number is mandatory field
-                </p>
+                {phone.length !== 10 && (
+                  <p className='mt-1 text-[11px] font-mono-code text-[#fc7c78]/80'>
+                    phone number must be 10 digits
+                  </p>
+                )}
               </div>
             </div>
 
@@ -537,7 +542,6 @@ export default function SignUp() {
                   required
                   min={1}
                   max={120}
-                  placeholder="25"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
                   className="w-full px-3 py-2 text-sm font-mono-code rounded border border-[#30363D] bg-[#0D1117] text-[#dde4dd] placeholder-[#4a554f]"
@@ -613,7 +617,7 @@ export default function SignUp() {
           </form>
 
           {/* Footer Navigation to Login */}
-          <div className="mt-2 pt-2 -mb-3 border-t border-[#242c27] text-center">
+          <div className="mt-4 pt-3 border-t border-[#242c27] text-center">
             <p className="text-xs font-body-sm text-[#86948a]">
               Already have an instance?{' '}
               <Link
