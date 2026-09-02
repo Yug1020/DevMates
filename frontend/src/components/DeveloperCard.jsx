@@ -1,20 +1,16 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
   const [connected, setConnected] = useState(developer.isConnected || false);
   const [connecting, setConnecting] = useState(false);
   const displayName = `${developer.firstName || ''} ${developer.lastName || ''}`.trim() || 'Developer';
   const skills = developer.skills || [];
+  const navigate = useNavigate();
 
   const handleConnectClick = (e) => {
     e.stopPropagation();
-    if (connected) return;
-    setConnecting(true);
-    setTimeout(() => {
-      setConnecting(false);
-      setConnected(true);
-      if (onConnect) onConnect(developer);
-    }, 600);
+    navigate("/messages")
   };
 
 
@@ -107,21 +103,7 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
                 : 'bg-[#0f241c]/70 border-[#2b5a45] text-[#4edea3] hover:bg-[#4edea3] hover:text-[#000000] hover:border-[#4edea3]'
               }`}
           >
-            {connecting ? (
-              <>
-                <span className="material-symbols-outlined text-xs animate-spin">
-                  progress_activity
-                </span>
-                <span>Chat</span>
-              </>
-            ) : connected ? (
-              <>
-                <span className="material-symbols-outlined text-xs">done</span>
-                <span>Chat</span>
-              </>
-            ) : (
-              <span>Chat</span>
-            )}
+            <span>Chat</span>
           </button>
         </div>
       </div>

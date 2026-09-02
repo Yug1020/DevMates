@@ -168,8 +168,8 @@ export default function DeveloperCard({
               </>
             ) : connected ? (
               <>
-                <span className="material-symbols-outlined text-xs">done</span>
-                <span>Connected</span>
+                {/* <span className="material-symbols-outlined text-xs">done</span> */}
+                <span>Request Sent</span>
               </>
             ) : (
               <span>Connect</span>

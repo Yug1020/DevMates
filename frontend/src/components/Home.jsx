@@ -3,6 +3,7 @@ import DeveloperFeedCard from './DeveloperFeedCard';
 import { ProfilePopover } from './RequestCard';
 import axios from 'axios';
 import { API_BASE_URL } from '../util/constant';
+import toast from 'react-hot-toast';
 
 // const INITIAL_DEVELOPERS = [
 //     {
@@ -126,7 +127,21 @@ export default function Home() {
         axios.
         post(API_BASE_URL + "/connections/send/connect/" + dev._id, {}, { withCredentials: true })
         .then(
-            setToastMessage(`Connection request sent to ${dev.firstName || " " + " " + dev.lastName || ""}!`),
+            toast.success(`Connection request sent to ${dev.firstName || " " + " " + dev.lastName || ""}!`, {
+              style: {
+                background: '#121c17',
+                border: '1px solid rgba(78, 222, 163, 0.4)',
+                color: '#4edea3',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontFamily: 'monospace',
+              },
+              iconTheme: {
+                primary: '#4edea3',
+                secondary: '#121c17',
+              },
+            }),
             setTimeout(() => {
                 setToastMessage('')
             }, 3500)
@@ -306,7 +321,7 @@ return (
             )}
 
             {/* Load More Developers Section */}
-            {!hasLoadedMore && (
+            {/* {!hasLoadedMore && (
                 <div className="flex items-center justify-center gap-4 text-xs font-mono-code text-[#7e8e83] py-12">
                     <span className="w-16 sm:w-24 h-px bg-[#1e2630]" />
                     <button
@@ -328,7 +343,7 @@ return (
                     </button>
                     <span className="w-16 sm:w-24 h-px bg-[#1e2630]" />
                 </div>
-            )}
+            )} */}
         </main>
 
         {/* Profile Detail Popover using ProfilePopover from RequestCard */}

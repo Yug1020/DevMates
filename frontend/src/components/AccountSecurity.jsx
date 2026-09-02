@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { API_BASE_URL } from '../util/constant';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 export default function AccountSecurity({ onToast }) {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -34,15 +35,48 @@ export default function AccountSecurity({ onToast }) {
     try {
       axios
       .patch(API_BASE_URL + "/user/profile/edit_password", {"old_password":currentPassword, "password":newPassword}, {withCredentials:true})
-      .then(
+      .then( (res) => {
         setLoading(true),
         setTimeout(() => {
           setLoading(false);
           setCurrentPassword('');
           setNewPassword('');
           setConfirmPassword('');
-          if (onToast) onToast('Password updated successfully!');
-        }, 600)       
+          if(res?.data === "Invalid credintials"){
+            toast.error("Current Password is wrong", {
+              style: {
+                background: 'rgba(255, 218, 214, 0.1)',
+                border: '1px solid rgba(255, 180, 171, 0.3)',
+                color: '#ffb4ab',
+                padding: '12px',
+                borderRadius: '4px',
+                fontSize: '12px',
+                fontFamily: 'monospace',
+              },
+              iconTheme: {
+                primary: '#ffb4ab',
+                secondary: '#1c1211',
+              },
+            });
+          }
+          if(res?.data === "Successfully updated user"){
+            toast.success(`Connection request sent to ${dev.firstName || " " + " " + dev.lastName || ""}!`, {
+              style: {
+                background: '#121c17',
+                border: '1px solid rgba(78, 222, 163, 0.4)',
+                color: '#4edea3',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontFamily: 'monospace',
+              },
+              iconTheme: {
+                primary: '#4edea3',
+                secondary: '#121c17',
+              },
+            });
+          }
+        }, 600)  }     
       )
       .catch((error) =>{
         setLoading(false);

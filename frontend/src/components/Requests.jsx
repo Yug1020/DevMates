@@ -3,6 +3,7 @@ import { API_BASE_URL } from '../util/constant';
 import { ProfilePopover, ReceivedRequestCard, SentRequestCard } from './RequestCard';
 import { useEffect } from 'react';
 import axios from "axios"
+import toast from 'react-hot-toast';
 
 const receivedRequests = [
   {
@@ -99,21 +100,72 @@ export default function Requests() {
   const acceptingInbound = (id) => {
     axios
     .post(API_BASE_URL + "/connections/received/accept/" + id, {}, {withCredentials: true})
-    .then(setInbound((requests) => requests.filter((request) => request.id !== id)))
+    .then(() => {
+      setInbound((requests) => requests.filter((request) => request._id !== id));
+      toast.success(`Request accepted successfully`, {
+        style: {
+          background: '#121c17',
+          border: '1px solid rgba(78, 222, 163, 0.4)',
+          color: '#4edea3',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontSize: '12px',
+          fontFamily: 'monospace',
+        },
+        iconTheme: {
+          primary: '#4edea3',
+          secondary: '#121c17',
+        },
+      }) 
+    })
     .catch((err) => {console.log(err)})  
   };
 
   const rejectingInbound = (id) => {
     axios
     .post(API_BASE_URL + "/connections/received/reject/" + id, {}, {withCredentials: true})
-    .then(setInbound((requests) => requests.filter((request) => request.id !== id)))
+    .then(() => {
+      setInbound((requests) => requests.filter((request) => request._id !== id));
+      toast.success('Request rejected successfully', {
+        style: {
+          background: '#121c17',
+          border: '1px solid rgba(78, 222, 163, 0.4)',
+          color: '#4edea3',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontSize: '12px',
+          fontFamily: 'monospace',
+        },
+        iconTheme: {
+          primary: '#4edea3',
+          secondary: '#121c17',
+        },
+      })
+    })
     .catch((err) => {console.log(err)})
   }
 
   const takeBackReq = (id) => {
     axios
     .post(API_BASE_URL + "/connections/send/pass/" + id, {}, {withCredentials: true})
-    .then(setOutbound((requests) => requests.filter((request) => request.id !== id)))
+    .then(() => {
+      setOutbound((requests) => requests.filter((request) => request._id !== id));
+      toast.success('Request cancelled successfully', {
+        style: {
+          background: '#121c17',
+          border: '1px solid rgba(78, 222, 163, 0.4)',
+          color: '#4edea3',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontSize: '12px',
+          fontFamily: 'monospace',
+        },
+        iconTheme: {
+          primary: '#4edea3',
+          secondary: '#121c17',
+        },
+      })     
+    })
     .catch((err) => {console.log(err)})
   }
 

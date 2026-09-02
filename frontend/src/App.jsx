@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from "react-redux";
 import appStore from "./util/store";
+import { Toaster } from 'react-hot-toast';
 import './App.css';
 
 import ProtectedRoutes from './util/ProtectedRoutes.jsx';
@@ -18,6 +19,7 @@ import Messages from './components/Messages.jsx';
 function App() {
   return (
     <Provider store={appStore}>
+      <Toaster position="top-center" reverseOrder={false} />
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
