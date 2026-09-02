@@ -1,10 +1,10 @@
+import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 export default function Sidebar({ mobileOpen, onCloseMobile }) {
   const location = useLocation();
 
   const mainNavItems = [
-
     {
       name: 'Home',
       path: '/',
@@ -47,43 +47,79 @@ export default function Sidebar({ mobileOpen, onCloseMobile }) {
     return location.pathname === itemPath;
   };
 
+  useEffect(() => {
+    const closeIfDesktop = () => {
+      if (window.matchMedia('(min-width: 768px)').matches) {
+        onCloseMobile?.();
+      }
+    };
+    window.addEventListener('resize', closeIfDesktop);
+    return () => window.removeEventListener('resize', closeIfDesktop);
+  }, [onCloseMobile]);
+
+  useEffect(() => {
+    if (!mobileOpen) return undefined;
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') onCloseMobile?.();
+    };
+    document.addEventListener('keydown', onKeyDown);
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileOpen, onCloseMobile]);
+
   return (
     <>
-      {/* Mobile Backdrop Overlay */}
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
-          onClick={onCloseMobile}
-        />
-      )}
+      <div
+        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ease-in-out md:hidden ${
+          mobileOpen
+            ? 'pointer-events-auto opacity-100'
+            : 'pointer-events-none opacity-0'
+        }`}
+        onClick={onCloseMobile}
+        aria-hidden="true"
+      />
 
-      {/* Sidebar Container */}
       <aside
-        className={`fixed left-0 top-0 z-50 w-61 h-screen bg-[#0c1015] border-r border-[#1e2630] flex flex-col justify-between select-none transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        id="app-sidebar"
+        className={`fixed top-0 left-0 z-50 flex h-screen w-61 select-none flex-col justify-between border-r border-[#1e2630] bg-[#0c1015] transition-transform duration-300 ease-in-out md:translate-x-0 ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        {/* Top: Brand Header & Main Nav */}
         <div>
-          {/* Brand Logo & Name */}
-          <div className="p-5 flex items-center gap-3 border-b border-[#1a232c]/50">
-            <div className="w-9 h-9 rounded-lg bg-[#141d24] border border-[#263340] flex items-center justify-center text-[#4edea3] shadow-sm">
-              <span className="material-symbols-outlined text-[22px]">
-                terminal
-              </span>
+          <div className="flex items-center justify-between gap-3 border-b border-[#1a232c]/50 p-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#263340] bg-[#141d24] text-[#4edea3] shadow-sm">
+                <span className="material-symbols-outlined text-[22px]">
+                  terminal
+                </span>
+              </div>
+              <div>
+                <span className="font-headline-md block text-lg leading-none font-bold tracking-tight text-[#4edea3]">
+                  DevMates
+                </span>
+                <span className="font-mono-code mt-1 block text-[11px] tracking-wider text-[#718076]">
+                  Developer Network
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="font-headline-md text-lg font-bold tracking-tight text-[#4edea3] block leading-none">
-                DevMates
-              </span>
-              <span className="font-mono-code text-[11px] text-[#718076] tracking-wider block mt-1">
-                Developer Network
-              </span>
-            </div>
+            <button
+              type="button"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#7e8e83] transition-colors hover:bg-[#161e27] hover:text-[#dde4dd] md:hidden"
+              aria-label="Close navigation menu"
+              onClick={onCloseMobile}
+            >
+              <span className="material-symbols-outlined text-[22px]">close</span>
+            </button>
           </div>
 
-          {/* Main Navigation List */}
-          <nav className="py-4 space-y-1">
+          <nav className="space-y-1 py-4">
             {mainNavItems.map((item) => {
               const active = isItemActive(item.path);
               return (
@@ -91,15 +127,14 @@ export default function Sidebar({ mobileOpen, onCloseMobile }) {
                   key={item.name}
                   to={item.path}
                   onClick={() => onCloseMobile && onCloseMobile()}
-                  className={`flex items-center gap-3 px-5 py-2.5 text-xs font-mono-code transition-all duration-150 relative ${
+                  className={`font-mono-code relative flex items-center gap-3 px-5 py-2.5 text-xs transition-all duration-150 ${
                     active
-                      ? 'text-[#4edea3] bg-[#121c17] font-semibold'
-                      : 'text-[#7e8e83] hover:text-[#dde4dd] hover:bg-[#12181f]'
+                      ? 'bg-[#121c17] font-semibold text-[#4edea3]'
+                      : 'text-[#7e8e83] hover:bg-[#12181f] hover:text-[#dde4dd]'
                   }`}
                 >
-                  {/* Left Active Indicator Bar */}
                   {active && (
-                    <span className="absolute left-0 top-0 bottom-0 w-1 bg-[#4edea3]" />
+                    <span className="absolute top-0 bottom-0 left-0 w-1 bg-[#4edea3]" />
                   )}
                   <span
                     className={`material-symbols-outlined text-[19px] ${
@@ -115,8 +150,7 @@ export default function Sidebar({ mobileOpen, onCloseMobile }) {
           </nav>
         </div>
 
-        {/* Bottom: Profile, Settings, and Start Session Button */}
-        <div className="p-4 space-y-4 border-t border-[#1a232c]/80">
+        <div className="space-y-4 border-t border-[#1a232c]/80 p-4">
           <div className="space-y-1">
             {bottomNavItems.map((item) => {
               const active = isItemActive(item.path);
@@ -125,10 +159,10 @@ export default function Sidebar({ mobileOpen, onCloseMobile }) {
                   key={item.name}
                   to={item.path}
                   onClick={() => onCloseMobile && onCloseMobile()}
-                  className={`flex items-center gap-3 px-3 py-2 text-xs font-mono-code rounded transition-colors ${
+                  className={`font-mono-code flex items-center gap-3 rounded px-3 py-2 text-xs transition-colors ${
                     active
-                      ? 'text-[#4edea3] bg-[#121c17]'
-                      : 'text-[#7e8e83] hover:text-[#dde4dd] hover:bg-[#12181f]'
+                      ? 'bg-[#121c17] text-[#4edea3]'
+                      : 'text-[#7e8e83] hover:bg-[#12181f] hover:text-[#dde4dd]'
                   }`}
                 >
                   <span className="material-symbols-outlined text-[19px]">
@@ -140,10 +174,9 @@ export default function Sidebar({ mobileOpen, onCloseMobile }) {
             })}
           </div>
 
-          {/* Start Session CTA Button */}
           <button
             type="button"
-            className="w-full py-2.5 px-4 rounded-md font-mono-label font-bold text-xs text-[#000000] bg-[#4edea3] hover:bg-[#6ffbbe] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_2px_12px_rgba(78,222,163,0.3)]"
+            className="font-mono-label flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-[#4edea3] px-4 py-2.5 text-xs font-bold text-[#000000] shadow-[0_2px_12px_rgba(78,222,163,0.3)] transition-all hover:bg-[#6ffbbe] active:scale-[0.98]"
           >
             <span className="material-symbols-outlined text-sm font-bold">
               play_arrow

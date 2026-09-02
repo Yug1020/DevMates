@@ -4,23 +4,24 @@ import Sidebar from '../components/Sidebar';
 import { Outlet } from 'react-router-dom';
 
 const Dashboard = () => {
-    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-    return (
-        <div>
-            {/* Layout stays consistent across sub-pages */}
-            <Header />
-            <Sidebar
-              mobileOpen={mobileSidebarOpen}
-              onCloseMobile={() => setMobileSidebarOpen(false)}
-            />
-            
-            {/* Dynamic pages content slots here */}
-            <main className="lg:ml-[15.25rem]">
-                <Outlet />
-            </main>
-        </div>
-    );
+  return (
+    <div>
+      <Header
+        mobileSidebarOpen={mobileSidebarOpen}
+        onToggleMobileSidebar={() => setMobileSidebarOpen((open) => !open)}
+      />
+      <Sidebar
+        mobileOpen={mobileSidebarOpen}
+        onCloseMobile={() => setMobileSidebarOpen(false)}
+      />
+
+      <main className="md:ml-[15.25rem]">
+        <Outlet />
+      </main>
+    </div>
+  );
 };
 
 export default Dashboard;

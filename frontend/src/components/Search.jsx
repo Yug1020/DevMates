@@ -27,9 +27,9 @@ export default function SearchBar() {
           className="w-75 pl-12 py-2 border border-[#202932] bg-[#0e1318] text-[#dde4dd] placeholder:text-[#7e8e83] focus:border-[#4edea3] focus:ring-[#4edea3] focus:outline-none"
         />
       </div>
-      <DropdownMenu>
+      <DropdownMenu className="">
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex items-center">
+          <Button variant="outline" className="hidden sm:flex items-center">
             <Funnel />
           </Button>
         </DropdownMenuTrigger>
