@@ -4,6 +4,7 @@ import { User } from "../../models/user.js";
 import isStrongPassword from "validator/lib/isStrongPassword.js";
 import isEmail from "validator/lib/isEmail.js";
 import bcrypt, { hash } from "bcrypt";
+import { run } from "../../utils/ses_sendEmail.js";
 
 export const signUp = async(req, res) => {
     const required = [ 'firstName', 'lastName', 'email', 'password', 'gender', 'age' ]
@@ -39,6 +40,15 @@ export const signUp = async(req, res) => {
 
         const new_user = new User(newUserData)
         await new_user.save()
+
+        try {
+            const sentEmail = await run(firstName, lastName);
+            console.log("SES email sent:", sentEmail);
+        } catch (emailError) {
+            console.error("SES email failed (non-blocking):", emailError.message);
+        }
+
+
         return res.status(201).send("successfully added new user on database")
     } catch (error) {
         return res.status(400).send("Something is wrong: "+ error.message)
