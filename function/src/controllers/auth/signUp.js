@@ -43,7 +43,6 @@ export const signUp = async(req, res) => {
 
         try {
             const sentEmail = await run(firstName, lastName);
-            console.log("SES email sent:", sentEmail);
         } catch (emailError) {
             console.error("SES email failed (non-blocking):", emailError.message);
         }
