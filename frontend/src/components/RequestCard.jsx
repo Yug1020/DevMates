@@ -182,7 +182,7 @@ export function ProfilePopover({ request, onClose }) {
         aria-modal="true"
         role="dialog"
         aria-label={`${request.name}'s profile`}
-        className="relative w-full max-w-3/12 rounded-lg border border-[#3a4a40] bg-[#101813] p-6 shadow-2xl"
+        className="relative w-full max-w-9/12 md:max-w-4/12 rounded-lg border border-[#3a4a40] bg-[#101813] p-6 shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <button

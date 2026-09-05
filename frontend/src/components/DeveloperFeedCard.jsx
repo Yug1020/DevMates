@@ -31,7 +31,8 @@ export default function DeveloperCard({
     'Developer';
 
   const skills = developer?.skills || [];
-  const primarySkill = skills[0] || 'Developer';
+  const profession = developer?.profession || "Engineer";
+  const primarySkill = developer.goal || '---';
   const goalIcon = developer?.goalIcon || getGoalIcon(primarySkill, index);
 
   const handleConnectClick = (e) => {
@@ -82,7 +83,7 @@ export default function DeveloperCard({
 
           {/* Role / Stack Badge in top right */}
           <span className="text-[11px] font-mono-code px-2.5 py-0.5 rounded bg-[#17212b] border border-[#273646] text-[#9fb0a5] tracking-wide flex-shrink-0">
-            {primarySkill}
+            {profession}
           </span>
         </div>
 

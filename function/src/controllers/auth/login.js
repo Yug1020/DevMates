@@ -14,8 +14,13 @@ export const login = async (req, res) => {
             return res.status(404).send("Invalid credentials")
         }
 
-        const filteredUserInfo = { firstName: isMail.firstName, lastName: isMail.lastName, streetName:isMail.streetName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, photoURL: isMail.photoURL, skills: isMail.skills }
-        
+        const filteredUserInfo = { firstName: isMail.firstName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, photoURL: isMail.photoURL, skills: isMail.skills}
+        if (isMail.lastName) filteredUserInfo.lastName = isMail.lastName;
+        if (isMail.streetName) filteredUserInfo.streetName = isMail.streetName;
+        if (isMail.profession) filteredUserInfo.profession = isMail.profession;
+        if (isMail.goal) filteredUserInfo.goal = isMail.goal;
+        if (isMail.bio) filteredUserInfo.bio = isMail.bio;
+
         //Mongoose method of password verification
         const match = await isMail.verifyPassword(password)
 

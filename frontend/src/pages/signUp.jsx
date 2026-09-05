@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../util/constant';
 import axios from 'axios';
+import { format } from 'date-fns';
+import { Calendar as CalendarIcon, X as XIcon } from 'lucide-react';
+import { Calendar } from '../components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 
 const DEFAULT_AVATAR =
   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80';
@@ -27,10 +31,14 @@ export default function SignUp() {
   // Form State
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [username, setUsername] = useState('');
+  const [streetName, setStreetName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
+  const [profession, setProfession] = useState('');
+  const [goal, setGoal] = useState('');
+  const [goalDeadline, setGoalDeadline] = useState(null);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
   const [bio, setBio] = useState('');
@@ -140,13 +148,15 @@ export default function SignUp() {
       const payload = {
         firstName: firstName.trim(),
         lastName: lastName.trim() || undefined,
-        streetName: username.trim() || undefined,
-        username: username.trim() || undefined,
+        streetName: streetName.trim() || undefined,
         email: email.trim(),
         password,
         phone: Number(phone),
         gender,
         age: Number(age),
+        profession: profession.trim() || undefined,
+        goal: goal.trim() || undefined,
+        goalDeadline: goalDeadline ? goalDeadline.toISOString() : undefined,
         bio: bio.trim() || undefined,
         skills: skillsArray,
         photoURL: photoURL || undefined,
@@ -405,17 +415,17 @@ export default function SignUp() {
               </div>
             </div>
 
-            {/* Row 2: Username & Email */}
+            {/* Row 2: Street Name & Email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-mono-label text-[#dde4dd] mb-1">
-                  Username
+                  User Name
                 </label>
                 <input
                   type="text"
-                  placeholder="adalovelace"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Developer"
+                  value={streetName}
+                  onChange={(e) => setStreetName(e.target.value)}
                   className="w-full px-3 py-2 text-sm font-mono-code rounded border border-[#30363D] bg-[#0D1117] text-[#dde4dd] placeholder-[#4a554f]"
                 />
               </div>
@@ -500,6 +510,83 @@ export default function SignUp() {
                     phone number must be 10 digits
                   </p>
                 )}
+              </div>
+            </div>
+
+            {/* Row: Profession & Current Goal */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Profession */}
+              <div>
+                <label className="block text-xs font-mono-label text-[#dde4dd] mb-1">
+                  Profession (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Full Stack Developer, Cyber Security Specialist..."
+                  value={profession}
+                  onChange={(e) => setProfession(e.target.value)}
+                  className="w-full px-3 py-2 text-sm font-mono-code rounded border border-[#30363D] bg-[#0D1117] text-[#dde4dd] placeholder-[#4a554f] focus:border-[#4edea3] outline-none"
+                />
+              </div>
+
+              {/* Current Goal */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-mono-label text-[#dde4dd]">
+                    Current Goal (Optional)
+                  </label>
+                  {goalDeadline && (
+                    <span className="text-[11px] font-mono-code text-[#4edea3] flex items-center gap-1">
+                      <span>Due: {format(goalDeadline, 'MMM d, yyyy')}</span>
+                      <button
+                        type="button"
+                        onClick={() => setGoalDeadline(null)}
+                        className="hover:text-[#fc7c78] ml-0.5 text-[#86948a] transition-colors cursor-pointer"
+                        title="Clear deadline"
+                      >
+                        <XIcon className="w-3 h-3" />
+                      </button>
+                    </span>
+                  )}
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    placeholder="learning Rust, Grinding Leetcode..."
+                    value={goal}
+                    onChange={(e) => setGoal(e.target.value)}
+                    className="w-full pl-3 pr-10 py-2 text-sm font-mono-code rounded border border-[#30363D] bg-[#0D1117] text-[#dde4dd] placeholder-[#4a554f] focus:border-[#4edea3] outline-none"
+                  />
+                  {/* Calendar Button at extreme right */}
+                  <div className="absolute right-1.5 flex items-center">
+                    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          className={`p-1.5 rounded hover:bg-[#242c27] transition-colors flex items-center justify-center cursor-pointer ${
+                            goalDeadline
+                              ? 'text-[#4edea3] bg-[#102a20]'
+                              : 'text-[#86948a] hover:text-[#dde4dd]'
+                          }`}
+                          title="Mark goal deadline"
+                        >
+                          <CalendarIcon className="w-4 h-4" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 border border-[#242c27] bg-[#161d19]" align="end">
+                        <Calendar
+                          mode="single"
+                          selected={goalDeadline}
+                          onSelect={(date) => {
+                            setGoalDeadline(date || null);
+                            setIsCalendarOpen(false);
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
               </div>
             </div>
 

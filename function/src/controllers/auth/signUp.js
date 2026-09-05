@@ -7,9 +7,9 @@ import bcrypt, { hash } from "bcrypt";
 import { run } from "../../utils/ses_sendEmail.js";
 
 export const signUp = async(req, res) => {
-    const required = [ 'firstName', 'lastName', 'email', 'password', 'gender', 'age' ]
+    const required = [ 'firstName', 'lastName', 'email', 'password', 'gender', 'age', 'phone', 'skills' ]
     try{
-        const {firstName, lastName, streetName, username, email, password, gender, age, phone, skills, photoURL, bio} = req.body
+        const {firstName, lastName, streetName, email, password, gender, age, phone, skills, photoURL, bio, profession, goal, goalDeadline} = req.body
         if(!(isEmail(email))){
             return res.status(400).send("Enter Valid Email")
         }
@@ -27,7 +27,7 @@ export const signUp = async(req, res) => {
         const newUserData = {
             firstName,
             lastName,
-            streetName: streetName || username,
+            streetName: streetName || undefined,
             email,
             password: hashedpassword,
             gender,
@@ -37,6 +37,9 @@ export const signUp = async(req, res) => {
         }
         if (photoURL) newUserData.photoURL = photoURL;
         if (bio) newUserData.bio = bio;
+        if (profession) newUserData.profession  =  profession; 
+        if (goal) newUserData.goal  =  goal;
+        if (goalDeadline) newUserData.goalDeadline  =  goalDeadline;
 
         const new_user = new User(newUserData)
         await new_user.save()
