@@ -36,9 +36,9 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [profession, setProfession] = useState('');
-  const [goal, setGoal] = useState('');
-  const [goalDeadline, setGoalDeadline] = useState(null);
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  // const [goal, setGoal] = useState('');
+  // const [goalDeadline, setGoalDeadline] = useState(null);
+  // const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
   const [bio, setBio] = useState('');
@@ -155,8 +155,8 @@ export default function SignUp() {
         gender,
         age: Number(age),
         profession: profession.trim() || undefined,
-        goal: goal.trim() || undefined,
-        goalDeadline: goalDeadline ? goalDeadline.toISOString() : undefined,
+        // goal: goal.trim() || undefined,
+        // goalDeadline: goalDeadline ? goalDeadline.toISOString() : undefined,
         bio: bio.trim() || undefined,
         skills: skillsArray,
         photoURL: photoURL || undefined,
@@ -514,11 +514,12 @@ export default function SignUp() {
             </div>
 
             {/* Row: Profession & Current Goal */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              {/* className="flex flex-row w-full items-center justify-between mb-1" */}
               {/* Profession */}
-              <div>
+              <div className='flex flex-col items-start justify-center'>
                 <label className="block text-xs font-mono-label text-[#dde4dd] mb-1">
-                  Profession (Optional)
+                  Profession <span className="text-[#fc7c78]">*</span>
                 </label>
                 <input
                   type="text"
@@ -530,7 +531,7 @@ export default function SignUp() {
               </div>
 
               {/* Current Goal */}
-              <div>
+              {/* <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-mono-label text-[#dde4dd]">
                     Current Goal (Optional)
@@ -557,7 +558,6 @@ export default function SignUp() {
                     onChange={(e) => setGoal(e.target.value)}
                     className="w-full pl-3 pr-10 py-2 text-sm font-mono-code rounded border border-[#30363D] bg-[#0D1117] text-[#dde4dd] placeholder-[#4a554f] focus:border-[#4edea3] outline-none"
                   />
-                  {/* Calendar Button at extreme right */}
                   <div className="absolute right-1.5 flex items-center">
                     <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                       <PopoverTrigger asChild>
@@ -587,7 +587,7 @@ export default function SignUp() {
                     </Popover>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Row 4: Gender & Age */}
