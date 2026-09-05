@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { User } from "../../models/user.js";
 
 export const update = async(req, res) => {
-    const editable = ["streetName", "phone", "photoURL", "skills", "bio"]
+    const editable = ["streetName", "phone", "photoURL", "skills", "bio", "profession", "goal", "goalDeadline"]
     try {
         const query = req.user
         const changes = req.body

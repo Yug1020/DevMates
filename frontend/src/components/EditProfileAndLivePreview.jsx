@@ -3,6 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setUser } from '../store/userSlice';
 import { API_BASE_URL } from '../util/constant.js';
 import axios from 'axios';
+import { format } from 'date-fns';
+import { Calendar as CalendarIcon, X as XIcon } from 'lucide-react';
+import { Calendar } from './ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 const DEFAULT_AVATAR =
   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80';
@@ -44,7 +48,13 @@ export default function EditProfileAndLivePreview({ onToast }) {
   const [firstName, setFirstName] = useState(reduxUser?.firstName || 'Alex');
   const [lastName, setLastName] = useState(reduxUser?.lastName || 'Chen');
   const [streetName, setStreetName] = useState(reduxUser?.streetName || 'Alex_Dev');
-  const [phone, setPhone] = useState(reduxUser?.phone ? String(reduxUser.phone) : '9876543210');
+  const [phone, setPhone] = useState(reduxUser?.phone ? String(reduxUser.phone) : '1234567890');
+  const [profession, setProfession] = useState(reduxUser?.profession || 'Engineer');
+  const [goal, setGoal] = useState(reduxUser?.goal || '');
+  const [goalDeadline, setGoalDeadline] = useState(
+    reduxUser?.goalDeadline ? new Date(reduxUser.goalDeadline) : null
+  );
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [bio, setBio] = useState(
     reduxUser?.bio ||
     'Building scalable systems and obsessing over clean architecture. Full-stack generalist.'
@@ -68,8 +78,7 @@ export default function EditProfileAndLivePreview({ onToast }) {
 
   const displayName =
     [firstName, lastName].filter(Boolean).join(' ') || streetName || 'Developer';
-  const primarySkill = parsedSkills[0] || 'Developer';
-  const goalIcon = getGoalIcon(primarySkill);
+  const goalIcon = getGoalIcon(goal);
 
   // Handle saving profile picture from popover
   const handleSaveAvatar = () => {
@@ -116,11 +125,14 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
   try {
     // 2. Tell JavaScript to pause here and 'await' the API response
     await axios.patch(API_BASE_URL + "/user/profile/update", { 
-      "streetName":streetName, 
-      "phone":phone, 
-      "photoURL":photoURL, 
-      "skills":[...parsedSkills], 
-      "bio":bio 
+      "streetName": streetName, 
+      "phone": phone, 
+      "photoURL": photoURL, 
+      "skills": [...parsedSkills], 
+      "bio": bio,
+      "profession": profession,
+      "goal": goal,
+      "goalDeadline": goalDeadline ? goalDeadline.toISOString() : null
     }, { withCredentials: true });
 
     // 3. This code ONLY runs after the await line successfully finishes!
@@ -131,6 +143,9 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
       bio,
       skills: parsedSkills,
       photoURL,
+      profession,
+      goal,
+      goalDeadline: goalDeadline ? goalDeadline.toISOString() : null,
     }));
     
     if (onToast) onToast('Profile changes saved successfully!');
@@ -148,6 +163,11 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
     setLastName(reduxUser?.lastName || 'Chen');
     setStreetName(reduxUser?.streetName || 'Alex_Dev');
     setPhone(reduxUser?.phone ? String(reduxUser.phone) : '9876543210');
+    setProfession(reduxUser?.profession || 'Engineer');
+    setGoal(reduxUser?.goal || '');
+    setGoalDeadline(
+      reduxUser?.goalDeadline ? new Date(reduxUser.goalDeadline) : null
+    );
     setBio(
       reduxUser?.bio ||
       'Building scalable systems and obsessing over clean architecture. Full-stack generalist.'
@@ -181,32 +201,45 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
 
           <form onSubmit={handleSaveChanges} className="space-y-5">
             {/* Profile Picture Row */}
-            <div className="flex items-center gap-4 relative pb-2">
-              <img
-                src={photoURL || DEFAULT_AVATAR}
-                alt="Profile Avatar"
-                className="w-16 h-16 rounded-xl object-cover border border-[#273646] shadow-sm flex-shrink-0"
-                onError={(e) => {
-                  e.currentTarget.src = DEFAULT_AVATAR;
-                }}
-              />
-
-              <div className="flex-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTempPhotoURL(photoURL);
-                    setShowAvatarPopover(true);
+            <div className="flex items-center justify-between gap-4 relative pb-2">
+              <div className="flex items-center gap-4">
+                <img
+                  src={photoURL || DEFAULT_AVATAR}
+                  alt="Profile Avatar"
+                  className="w-16 h-16 rounded-xl object-cover border border-[#273646] shadow-sm flex-shrink-0"
+                  onError={(e) => {
+                    e.currentTarget.src = DEFAULT_AVATAR;
                   }}
-                  className="px-3.5 py-1.5 text-xs font-mono-code border border-[#295c73] hover:border-[#38bdf8] text-[#7dd3fc] hover:bg-[#0c2231] rounded transition-colors cursor-pointer inline-flex items-center gap-1.5"
-                >
-                  <span className="material-symbols-outlined text-sm">photo_camera</span>
-                  <span>Change Profile Picture</span>
-                </button>
-                {/* <p className="text-[11px] font-mono-code text-[#718076] mt-1.5">
-                  JPG, GIF or PNG. Max size of 800K
-                </p> */}
+                />
+
+                <div className="flex-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTempPhotoURL(photoURL);
+                      setShowAvatarPopover(true);
+                    }}
+                    className="px-3.5 py-1.5 text-xs font-mono-code border border-[#295c73] hover:border-[#38bdf8] text-[#7dd3fc] hover:bg-[#0c2231] rounded transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  >
+                    <span className="material-symbols-outlined text-sm">photo_camera</span>
+                    <span>Change Profile Picture</span>
+                  </button>
+                  {/* <p className="text-[11px] font-mono-code text-[#718076] mt-1.5">
+                    JPG, GIF or PNG. Max size of 800K
+                  </p> */}
+
+                </div>
               </div>
+
+              {/* Profession Field (styled as in live preview role badge) */}
+              <input
+                type="text"
+                value={profession}
+                onChange={(e) => setProfession(e.target.value)}
+                placeholder="Profession"
+                title="Profession"
+                className="text-[11px] font-mono-code px-2.5 py-0.5 rounded bg-[#17212b] border border-[#273646] text-[#9fb0a5] tracking-wide flex-shrink-0 text-center focus:border-[#4edea3] focus:text-[#dde4dd] outline-none transition-colors"
+              />
 
               {/* Profile Picture URL Popover (referencing signUp.jsx:L270-L354) */}
               {showAvatarPopover && (
@@ -402,6 +435,69 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
               </div>
             </div>
 
+            {/* Current Goal Input */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-mono-code text-[#8a9990]">
+                  Current Goal
+                </label>
+                {goalDeadline && (
+                  <span className="text-[11px] font-mono-code text-[#4edea3] flex items-center gap-1">
+                    <span>Due: {format(new Date(goalDeadline), 'MMM d, yyyy')}</span>
+                    <button
+                      type="button"
+                      onClick={() => setGoalDeadline(null)}
+                      className="hover:text-[#fc7c78] ml-0.5 text-[#86948a] transition-colors cursor-pointer"
+                      title="Clear deadline"
+                    >
+                      <XIcon className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+              </div>
+              <div className="relative flex items-center">
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#7e8e83]">
+                  flag
+                </span>
+                <input
+                  type="text"
+                  value={goal}
+                  onChange={(e) => setGoal(e.target.value)}
+                  placeholder="learning Rust, Grinding Leetcode..."
+                  className="w-full pl-9 pr-10 py-2 text-xs font-mono-code bg-[#080d11] border border-[#202932] rounded text-[#dde4dd] focus:border-[#4edea3] outline-none transition-colors placeholder-[#4a554f]"
+                />
+                {/* Calendar Button at extreme right */}
+                <div className="absolute right-1.5 flex items-center">
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className={`p-1.5 rounded hover:bg-[#242c27] transition-colors flex items-center justify-center cursor-pointer ${
+                          goalDeadline
+                            ? 'text-[#4edea3] bg-[#102a20]'
+                            : 'text-[#86948a] hover:text-[#dde4dd]'
+                        }`}
+                        title="Mark goal deadline"
+                      >
+                        <CalendarIcon className="w-4 h-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 border border-[#242c27] bg-[#161d19]" align="end">
+                      <Calendar
+                        mode="single"
+                        selected={goalDeadline ? new Date(goalDeadline) : undefined}
+                        onSelect={(date) => {
+                          setGoalDeadline(date || null);
+                          setIsCalendarOpen(false);
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+            </div>
+
             {/* Bottom Actions */}
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#1b2633]">
               <button
@@ -462,14 +558,14 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
                       {displayName}
                     </h3>
                     <p className="text-xs font-mono-code text-[#0EA5E9] mt-0.5 truncate">
-                      {streetName || primarySkill}
+                      {streetName}
                     </p>
                   </div>
                 </div>
 
                 {/* Role / Stack Badge in top right */}
                 <span className="text-[11px] font-mono-code px-2.5 py-0.5 rounded bg-[#17212b] border border-[#273646] text-[#9fb0a5] tracking-wide flex-shrink-0">
-                  {primarySkill}
+                  {profession}
                 </span>
               </div>
 
@@ -505,7 +601,7 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
               <div className="bg-[#0b1015] border border-[#1d2732] rounded-md px-3 py-2 flex items-center justify-between text-xs font-mono-code">
                 <div className="flex items-center gap-2 text-[#c2d0c6] truncate mr-2">
                   <span className="text-sm">{goalIcon}</span>
-                  <span className="truncate">{primarySkill}</span>
+                  <span className="truncate">{goal}</span>
                 </div>
                 {/* Glowing live status indicator dot with pulse animation */}
                 <span className="relative flex h-2 w-2 flex-shrink-0" title="Online now">
