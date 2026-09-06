@@ -9,6 +9,11 @@ export const sendReq = async(req, res) => {
     const fromRequest = req.user._id;
     const toRequest = req.params.toUserId;
     const sentStatus = req.params.sentStatus;
+    
+    const isGoal = req.user.goal;
+    if(!isGoal){
+        return res.status(403).send("Add goal")
+    }
 
     const real_user = await User.findById(toRequest)
 
@@ -30,7 +35,7 @@ export const sendReq = async(req, res) => {
     }
 
     if(reqExist){
-        return res.send("request already send");
+        return res.status(200).send("request already send");
     }
 
     const data = new ConnectionRequest({
@@ -44,7 +49,7 @@ export const sendReq = async(req, res) => {
 
     res.json(data)
     }catch(error){
-        res.status(400).send("something is wrong, " + error)
+        return res.status(400).send("something is wrong, " + error)
     }
 }
 

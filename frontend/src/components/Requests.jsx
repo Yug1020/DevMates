@@ -197,15 +197,15 @@ export default function Requests() {
               </h1>
               <p className="mt-2 text-sm text-[#aebdb2] sm:text-base">Manage your inbound and outbound developer network connections.</p>
             </div>
-            <label className="relative block w-full max-w-xs">
-              <span className="sr-only">Search requests by name</span>
+            <label className="relative block lg:w-6/12">
+              {/* <span className="sr-only">Search requests by name</span> */}
               <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-[#8da096]">search</span>
               <input
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Filter requests..."
-                className="w-full rounded-sm border border-[#3a4840] bg-[#101713] py-2.5 pl-10 pr-3 font-mono-code text-sm text-[#dce6df] outline-none placeholder:text-[#89998f] focus:border-[#4edea3]"
+                className="w-full rounded-sm border border-[#3a4840] bg-[#101713] py-2.5 px-2 pl-10 font-mono-code text-sm text-[#dce6df] outline-none placeholder:text-[#89998f] focus:border-[#4edea3]"
               />
             </label>
           </div>

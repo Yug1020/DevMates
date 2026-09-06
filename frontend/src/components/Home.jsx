@@ -124,43 +124,95 @@ export default function Home() {
 
     // Handle Connect Click Feedback
     const handleConnect = (dev) => {
-        axios.
-        post(API_BASE_URL + "/connections/send/connect/" + dev._id, {}, { withCredentials: true })
-        .then(
+        return axios
+        .post(API_BASE_URL + "/connections/send/connect/" + dev._id, {}, { withCredentials: true })
+        .then((res) => {
             toast.success(`Connection request sent to ${dev.firstName || " " + " " + dev.lastName || ""}!`, {
+                style: {
+                    background: '#121c17',
+                    border: '1px solid rgba(78, 222, 163, 0.4)',
+                    color: '#4edea3',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontFamily: 'monospace',
+                },
+                iconTheme: {
+                    primary: '#4edea3',
+                    secondary: '#121c17',
+                },
+            }),
+            setTimeout(() => {
+                setToastMessage('');
+            }, 3500)
+            return res
+        })
+        .catch((err) => {
+            console.log("err", err);
+
+        // Check if the server responded with a 403 error status
+        if (err.response && err.response.status === 403) {
+            toast.error("Add goal first to connect with others", {
               style: {
-                background: '#121c17',
-                border: '1px solid rgba(78, 222, 163, 0.4)',
-                color: '#4edea3',
-                padding: '12px 16px',
-                borderRadius: '8px',
+                background: 'rgba(255, 218, 214, 0.1)',
+                border: '1px solid rgba(255, 180, 171, 0.3)',
+                color: '#ffb4ab',
+                padding: '12px',
+                borderRadius: '4px',
                 fontSize: '12px',
                 fontFamily: 'monospace',
               },
               iconTheme: {
-                primary: '#4edea3',
-                secondary: '#121c17',
+                primary: '#ffb4ab',
+                secondary: '#1c1211',
               },
-            }),
+            });
             setTimeout(() => {
-                setToastMessage('')
-            }, 3500)
-        )
-        .catch((err) => console.log("err", err))
+                setToastMessage('');
+            }, 3500);
+        }
+            throw err;
+        });
     };
 
     // Handle Ignore Click Feedback
     const handleIgnore = (dev) => {
-        axios
+        return axios
         .post(API_BASE_URL + "/connections/send/ignore/" + dev._id, {}, { withCredentials: true })
-        .then(
-            setDevelopersList((prev) => prev.filter((d) => d._id !== dev._id)),
-            setToastMessage(`Ignored ${dev.firstName || "" + " " + dev.lastName || ""}`),
+        .then((res) => {
+            setDevelopersList((prev) => prev.filter((d) => d._id !== dev._id));
+            setToastMessage(`Ignored ${dev.firstName || "" + " " + dev.lastName || ""}`);
             setTimeout(() => {
                 setToastMessage('');
-            }, 3000)
-        )
-        .catch((err) => console.log("err", err))
+            }, 3000);
+            return res;
+        })
+        .catch((err) => {
+            console.log("err", err);
+
+            if (err.response && err.response.status === 403) {
+                toast.error("Add goal first to connect with others", {
+                    style: {
+                        background: 'rgba(255, 218, 214, 0.1)',
+                        border: '1px solid rgba(255, 180, 171, 0.3)',
+                        color: '#ffb4ab',
+                        padding: '12px',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        fontFamily: 'monospace',
+                    },
+                    iconTheme: {
+                        primary: '#ffb4ab',
+                        secondary: '#1c1211',
+                    },
+                });
+                setTimeout(() => {
+                    setToastMessage('');
+                }, 3500);
+            }
+
+            throw err;
+        });
     };
 
 // Handle Load More Developers
@@ -220,8 +272,7 @@ return (
                 </div>
 
                 {/* Filter Controls Toolbar */}
-                <div className="flex items-center gap-2.5 flex-wrap">
-                    {/* Roles Dropdown */}
+                {/* <div className="flex items-center gap-2.5 flex-wrap">
                     <div className="relative">
                         <select
                             value={selectedRole}
@@ -241,7 +292,6 @@ return (
                         </div>
                     </div>
 
-                    {/* Skills Dropdown */}
                     <div className="relative">
                         <select
                             value={selectedSkill}
@@ -269,7 +319,6 @@ return (
                         </div>
                     </div>
 
-                    {/* More Filter Button with tune icon */}
                     <button
                         type="button"
                         onClick={() => {
@@ -282,7 +331,7 @@ return (
                         <span className="material-symbols-outlined text-sm text-[#7e8e83]">tune</span>
                         <span>More</span>
                     </button>
-                </div>
+                </div> */}
             </div>
 
             {/* Developer Cards Grid */}

@@ -35,22 +35,35 @@ export default function DeveloperCard({
   const primarySkill = developer.goal || '---';
   const goalIcon = developer?.goalIcon || getGoalIcon(primarySkill, index);
 
-  const handleConnectClick = (e) => {
+  const handleConnectClick = async (e) => {
     e.stopPropagation();
     if (connected || connecting) return;
     setConnecting(true);
-    setTimeout(() => {
-      setConnecting(false);
+
+    try {
+      if (!onConnect) return;
+      await onConnect(developer);
       setConnected(true);
-      if (onConnect) onConnect(developer);
-    }, 500);
+    } catch (err) {
+      // Keep the card connectable when the request fails.
+      console.error('Connection request failed', err);
+    } finally {
+      setConnecting(false);
+    }
   };
 
-  const handleIgnoreClick = (e) => {
-
+  const handleIgnoreClick = async (e) => {
     e.stopPropagation();
-    setIgnored(true);
-    if (onIgnore) onIgnore(developer);
+    if (ignored) return;
+
+    try {
+      if (!onIgnore) return;
+      await onIgnore(developer);
+      setIgnored(true);
+    } catch (err) {
+      // Keep the card visible when the request fails.
+      console.error('Ignore request failed', err);
+    }
   };
 
   if (ignored) {

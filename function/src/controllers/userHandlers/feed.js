@@ -13,7 +13,7 @@ export const feed = async (req, res) => {
 
         // const skip = (page - 1)*limit;
 
-        const query = { $and: [{ $or: [{ fromRequest: loggedInUser }, { toRequest: loggedInUser }] }, { $or: [{ sentStatus: "connect" }, { sentStatus: "ignore" }] }, { $or: [{ receivedStatus: "accept" }, { receivedStatus: "rejected" }, { receivedStatus: "pending" }] }] }
+        const query = { $and: [{ $or: [{ fromRequest: loggedInUser }, { toRequest: loggedInUser }] }, { $or: [{ sentStatus: "connect" }, { sentStatus: "ignore" }] }, { $or: [{ receivedStatus: "accept" }, { receivedStatus: "reject" }, { receivedStatus: "pending" }] }] }
 
         const reqExist = await ConnectionRequest.find(query) //.populate("fromRequest", ["firstName"]).populate("toRequest", ["firstName"]);
 

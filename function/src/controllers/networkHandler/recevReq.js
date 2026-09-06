@@ -10,6 +10,11 @@ export const recevReq = async(req, res) => {
         const receivedStatus = req.params.receivedStatus;
         const fromId = req.params.fromUserId;
 
+        const isGoal = req.user.goal;
+        if(!isGoal){
+            return res.status(403).send("Add goal")
+        }  
+
         const query = {fromRequest: fromId, toRequest: loggedInUser._id, sentStatus: "connect"}; // receivedStatus: "pending"
 
         const reqExist = await ConnectionRequest.findOneAndUpdate(query, {receivedStatus: receivedStatus}, {returnDocument:"after"}).populate('fromRequest', USER_INFO)

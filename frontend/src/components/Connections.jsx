@@ -190,8 +190,7 @@ export default function Connections() {
             </div>
 
             {/* Filter Controls Toolbar */}
-            <div className="flex items-center gap-2.5 flex-wrap">
-              {/* Roles Dropdown */}
+            {/* <div className="flex items-center gap-2.5 flex-wrap">
               <div className="relative">
                 <select
                   value={selectedRole}
@@ -212,7 +211,6 @@ export default function Connections() {
                 </div>
               </div>
 
-              {/* Skills Dropdown */}
               <div className="relative">
                 <select
                   value={selectedSkill}
@@ -239,7 +237,6 @@ export default function Connections() {
                 </div>
               </div>
 
-              {/* More Filter Button */}
               <button
                 type="button"
                 onClick={() => {
@@ -255,7 +252,7 @@ export default function Connections() {
                 </span>
                 <span>More</span>
               </button>
-            </div>
+            </div> */}
           </div>
 
           {/* Developer Cards Grid */}

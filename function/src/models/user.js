@@ -22,29 +22,24 @@ const userSchema = new mongoose.Schema(
         bio:{type:String, max:150},
         profession:{type:String, max:20, default:"Engineer"},
         goal:{type:String, max:20},
-        goalDeadline:{type: Date},
+        // MongoDB Date values are instants and are stored in UTC. The client
+        // should send an ISO date with its offset (for example +05:30 for IST).
+        goalDeadline:{type: Date, 
+          default: () => 
+          {
+            const now = new Date();
+            // Add 5.5 hours in milliseconds (5.5 * 60 * 60 * 1000)
+            const istOffset = 5.5 * 60 * 60 * 1000; 
+            return new Date(now.getTime() + istOffset);
+          }
+        },
         skills:{
             type:[String], 
             minlength:1, 
             set:(incomingArray) => {return [...new Set(incomingArray)]} //remove duplicate
-        },
-        createdAt: { type: Date, default: () => 
-          {
-            const now = new Date();
-            // Add 5.5 hours in milliseconds (5.5 * 60 * 60 * 1000)
-            const istOffset = 5.5 * 60 * 60 * 1000; 
-            return new Date(now.getTime() + istOffset);
-          }
-        },
-        updatedAt: { type: Date, default: () => 
-          {
-            const now = new Date();
-            // Add 5.5 hours in milliseconds (5.5 * 60 * 60 * 1000)
-            const istOffset = 5.5 * 60 * 60 * 1000; 
-            return new Date(now.getTime() + istOffset);
-          }
-        }              
-    }
+        }
+    },
+    { timestamps: true }
 )
 
 

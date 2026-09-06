@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { checkGoal } from "./src/utils/checkGoal.js";
 
 import { authRoute } from "./src/route/authRoute.js";
 import { userRoute } from "./src/route/userRoute.js";
@@ -20,7 +21,6 @@ app.use(cors({
 }))
 
 async function main(){
-
 app.use(express.json())
 app.use(cookieParser())
 
@@ -37,6 +37,8 @@ app.use("/connections", connectionReqRoute);
 try {
     await mongoose.connect(process.env.MONGODB)
     console.log("successfully connected to DB")   
+    checkGoal.start();
+    console.log(`Goal checker scheduled for ${checkGoal.nextDate().toISO()}`);
     app.listen(5375, console.log("successfully live on 5375"))
 }
 catch(error){
