@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { setUser } from '../store/userSlice';
 import { API_BASE_URL } from '../util/constant.js';
 import axios from 'axios';
@@ -43,6 +44,8 @@ const getGoalIcon = (skill = '') => {
 export default function EditProfileAndLivePreview({ onToast }) {
   const dispatch = useDispatch();
   const reduxUser = useSelector((state) => state.user);
+  const location = useLocation();
+  const goalInputRef = useRef(null);
 
   // Form State adhering to userSchema
   const [firstName, setFirstName] = useState(reduxUser?.firstName || 'Alex');
@@ -65,6 +68,17 @@ export default function EditProfileAndLivePreview({ onToast }) {
       : 'React, Node.js, Go, PostgreSQL'
   );
   const [photoURL, setPhotoURL] = useState(reduxUser?.photoURL || DEFAULT_AVATAR);
+
+  useEffect(() => {
+    if (!location.state?.focusGoal) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      goalInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      goalInputRef.current?.focus();
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [location.state?.focusGoal]);
 
   // Popover State for Profile Picture URL
   const [showAvatarPopover, setShowAvatarPopover] = useState(false);
@@ -232,8 +246,8 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
               </div>
 
               {/* Profession Field (styled as in live preview role badge) */}
-              <input
-                type="text"
+            <input
+              type="text"
                 value={profession}
                 onChange={(e) => setProfession(e.target.value)}
                 placeholder="Profession"
@@ -460,6 +474,7 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
                   flag
                 </span>
                 <input
+                  ref={goalInputRef}
                   type="text"
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}

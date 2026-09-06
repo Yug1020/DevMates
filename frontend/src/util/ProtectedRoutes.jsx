@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
 import axios from 'axios';
 import { setUser } from '../store/userSlice';
 import { API_BASE_URL } from './constant.js';
+import LoginPopover from '../components/loginPopover';
+
+const hasEmptyGoal = (goal) =>
+    typeof goal !== 'string' || goal.trim().length === 0;
 
 const ProtectedRoutes = () => {
     // 1. Check if the user is in the Redux store
     const user = useSelector((store) => store.user);
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(!user);
+    const [showGoalPopover, setShowGoalPopover] = useState(() =>
+        Boolean(user && hasEmptyGoal(user.goal))
+    );
 
     useEffect(() => {
         if (user) return;
@@ -19,6 +26,7 @@ const ProtectedRoutes = () => {
             .get(API_BASE_URL + '/user/profile', { withCredentials: true })
             .then((res) => {
                 dispatch(setUser(res.data));
+                setShowGoalPopover(hasEmptyGoal(res.data?.goal));
             })
             .catch(() => {
                 // Session expired or invalid cookie
@@ -39,7 +47,15 @@ const ProtectedRoutes = () => {
 
     // 4. If user exists, render the active child route layout using Outlet
     if (user) {
-        return <Outlet />;
+        return (
+            <>
+                <Outlet />
+                <LoginPopover
+                    open={showGoalPopover}
+                    onClose={() => setShowGoalPopover(false)}
+                />
+            </>
+        );
     }
 
     // 5. Kick unauthenticated users back to login
