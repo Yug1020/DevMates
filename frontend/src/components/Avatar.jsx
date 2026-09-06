@@ -24,7 +24,9 @@ export function AvatarDropdown({name, photo}) {
   const navigate = useNavigate();
 
   const Logout = async() => {
-    await axios.post(API_BASE_URL + "/logout", {}, { withCredentials: true }).then(dispatch(resetUser())).catch((err) => {console.log("err", err)})
+    await axios.post(API_BASE_URL + "/logout", {}, { withCredentials: true })
+    .then(() => { dispatch(resetUser()) })
+    .catch((err) => {console.log("err", err)})
   }
 
   return (
