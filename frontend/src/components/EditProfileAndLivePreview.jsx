@@ -215,7 +215,7 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
 
           <form onSubmit={handleSaveChanges} className="space-y-5">
             {/* Profile Picture Row */}
-            <div className="flex items-center justify-between gap-4 relative pb-2">
+            <div className="flex flex-wrap items-center justify-between gap-4 relative pb-2">
               <div className="flex items-center gap-4">
                 <img
                   src={photoURL || DEFAULT_AVATAR}
@@ -245,14 +245,13 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
                 </div>
               </div>
 
-              {/* Profession Field (styled as in live preview role badge) */}
-            <input
-              type="text"
-                value={profession}
-                onChange={(e) => setProfession(e.target.value)}
-                placeholder="Profession"
-                title="Profession"
-                className="text-[11px] font-mono-code px-2.5 py-0.5 rounded bg-[#17212b] border border-[#273646] text-[#9fb0a5] tracking-wide flex-shrink-0 text-center focus:border-[#4edea3] focus:text-[#dde4dd] outline-none transition-colors"
+              <input
+                type="text"
+                  value={profession}
+                  onChange={(e) => setProfession(e.target.value)}
+                  placeholder="Profession"
+                  title="Profession"
+                  className="text-[11px] font-mono-code px-2.5 py-0.5 rounded bg-[#17212b] border border-[#273646] text-[#9fb0a5] tracking-wide flex-shrink-0 text-center focus:border-[#4edea3] focus:text-[#dde4dd] outline-none transition-colors"
               />
 
               {/* Profile Picture URL Popover (referencing signUp.jsx:L270-L354) */}
