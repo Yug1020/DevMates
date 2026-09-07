@@ -568,7 +568,7 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
                     }}
                   />
                   <div className="min-w-0">
-                    <h3 className="font-bold text-[#dde4dd] text-[15px] leading-snug truncate">
+                    <h3 className="font-bold text-[#dde4dd] text-[15px] leading-snug">
                       {displayName}
                     </h3>
                     <p className="text-xs font-mono-code text-[#0EA5E9] mt-0.5 truncate">
