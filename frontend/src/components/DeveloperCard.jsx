@@ -34,14 +34,14 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
                 {displayName}
               </h3>
               <p className="text-xs font-mono-code text-[#7e8e83] mt-0.5">
-                {skills[0] || 'Developer'}
+                {developer.streetName || 'Developer'}
               </p>
             </div>
           </div>
 
           {/* Role Badge */}
           <span className="text-[11px] font-mono-code px-2 py-0.5 rounded bg-[#182029] border border-[#2c3744] text-[#9fb0a5] tracking-wide flex-shrink-0">
-            {skills[0] || 'Developer'}
+            {developer.profession || 'Developer'}
           </span>
         </div>
 
@@ -75,7 +75,7 @@ export default function DeveloperCard({ developer, onConnect, onViewProfile }) {
         <div className="bg-[#0b1015] border border-[#1e2833] rounded-md px-3 py-2 flex items-center justify-between text-xs font-mono-code">
           <div className="flex items-center gap-2 text-[#c2d0c6] truncate mr-2">
             <span className="text-sm">{developer.goalIcon || '🤝'}</span>
-            <span className="truncate">{developer.goalText || skills[1] || 'Developer connection'}</span>
+            <span className="truncate">{developer.goal || 'Developer connection'}</span>
           </div>
           {developer.hasLiveDot && (
             <span className="relative flex h-2 w-2 flex-shrink-0">

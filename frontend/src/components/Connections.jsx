@@ -323,7 +323,7 @@ export default function Connections() {
           onClick={() => setSelectedDevProfile(null)}
         >
           <div
-            className="w-full max-w-3/12 bg-[#12181f] border border-[#2c3744] rounded-xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+            className="w-full max-w-10/12 md:max-w-3/12 bg-[#12181f] border border-[#2c3744] rounded-xl p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between pb-4 border-b border-[#1e2630] mb-4">
@@ -338,7 +338,7 @@ export default function Connections() {
                     {selectedDevProfile.firstName + " " + selectedDevProfile.lastName}
                   </h2>
                   <p className="text-xs font-mono-code text-[#7e8e83]">
-                    {selectedDevProfile.skills[0]}
+                    {selectedDevProfile.profession}
                   </p>
                 </div>
               </div>
@@ -377,7 +377,7 @@ export default function Connections() {
                 <span className="text-[#7e8e83] block mb-1">Current Goal</span>
                 <div className="bg-[#0b1015] border border-[#1e2833] rounded-md px-3 py-2 flex items-center gap-2 text-[#dde4dd]">
                   <span>{selectedDevProfile.goalIcon}</span>
-                  <span>{selectedDevProfile.skills[1]}</span>
+                  <span>{selectedDevProfile.goal}</span>
                 </div>
               </div>
             </div>

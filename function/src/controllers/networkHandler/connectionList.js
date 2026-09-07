@@ -3,7 +3,7 @@ import { ConnectionRequest } from "../../models/connectionRequest.js";
 import { User } from "../../models/user.js";
 
 export const connectionList = async(req, res) => {
-    const USER_INFO = ["firstName", "lastName", "email", "gender", "age", "phone", "photoURL", "skills", "bio"]
+    const USER_INFO = ["firstName", "lastName", "streetName", "email", "gender", "age", "phone", "photoURL", "skills", "bio", "profession", "goal"]
 
     try {
         const loggedInUser = req.user._id;
