@@ -15,6 +15,7 @@ import Profile from './components/Profile';
 import Error from './components/Error';
 import Requests from './components/Requests.jsx';
 import Messages from './components/Messages.jsx';
+import DevMatesPro from './components/DevMatesPro.jsx';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
               <Route path="profile" element={<Profile />} />
               <Route path="requests" element={<Requests/>}/>
               <Route path="messages" element={<Messages/>}/>
+              <Route path="subscription" element={<DevMatesPro/>}/>
               
               {/* Error fallback inside the dashboard */}
               <Route path="*" element={<Error />} />

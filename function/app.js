@@ -8,6 +8,7 @@ import { authRoute } from "./src/route/authRoute.js";
 import { userRoute } from "./src/route/userRoute.js";
 import { profileRoute } from "./src/route/profileRoute.js";
 import { connectionReqRoute } from "./src/route/connectionReqRoute.js";
+import { razorpay } from "./src/route/razorpay.js";
 
 
 import dotenv from "dotenv";
@@ -30,6 +31,7 @@ app.use("/", authRoute);
 app.use("/user", userRoute);
 app.use("/user/profile", profileRoute);
 app.use("/connections", connectionReqRoute);
+app.use("/razorpay", razorpay);
 
 
 

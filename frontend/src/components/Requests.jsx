@@ -186,7 +186,7 @@ export default function Requests() {
 
 
   return (
-    <div className="min-h-screen bg-[#0a0f0c] text-[#dde4dd]">
+    <div className="min-h-screen bg-[#0a0e13] text-[#dde4dd]">
       <header className="border-b border-[#26342c] px-6 py-8 sm:px-10">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -209,7 +209,7 @@ export default function Requests() {
               />
             </label>
           </div>
-          <div className="mt-7 flex gap-7 border-b border-[#26342c]">
+          <div className="mt-7 flex gap-7 border-[#26342c]">
             <button
               type="button"
               onClick={() => setActiveTab('received')}
