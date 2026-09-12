@@ -20,9 +20,8 @@ export const createOrder = async(req, res) => {
         })
 
         const payload = {
-            paymentId: orderReq.id,
+            orderId: orderReq.id,
             userId: user._id,
-            paymentStatus: orderReq.status,
             status: orderReq.status
         }
 

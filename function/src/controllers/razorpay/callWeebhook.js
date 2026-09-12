@@ -34,7 +34,7 @@ export const callWeebhook = async (req, res) => {
             return res.status(200).json({ msg: "Webhook received without order_id" });
         }
 
-        const payment = await Payments.findOne({ paymentId: orderId });
+        const payment = await Payments.findOne({ orderId: orderId });
 
         if (!payment) {
             console.error(`Payment record not found for orderId: ${orderId}`);
@@ -44,7 +44,7 @@ export const callWeebhook = async (req, res) => {
         // Update payment status in Payments document
         const currentStatus = paymentDetails?.status;
         payment.status = currentStatus;
-        payment.paymentStatus = currentStatus;
+        payment.method = paymentDetails?.method;
         await payment.save();
 
         console.log(`Payment status updated: orderId=${orderId}, status=${currentStatus}`);

@@ -1,10 +1,15 @@
-import { ArrowRight, Bolt, Check, CircleAlert, Sparkles } from "lucide-react";
+import { ArrowRight, Bolt, Check, CircleAlert, Megaphone, Receipt, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { API_BASE_URL } from "../util/constant";
-import toast from "react-hot-toast";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const DevMatesPro = () => {
+
+  const [ isPro, setIsPro ] = useState(false)
+  const [ orderId, setOrderId ] = useState("")
+  const [ method, setMethod ] = useState("")
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -88,8 +93,155 @@ const DevMatesPro = () => {
     }  
   }
 
+  useEffect(() => {
+    axios
+    .get(API_BASE_URL + "/razorpay/verifyPayment", {withCredentials:true})
+    .then((res) => {
+      console.log(res)
+      if(res.data.isPremium){
+        setIsPro(true)
+        setOrderId(res.data.payload.orderId)
+        setMethod(res.data.payload.method)
+      }})
+    .catch((err) => {console.log(err)})
+  },[])
 
   return (
+    isPro ? (
+      <section className="min-h-[calc(100vh-4rem)] bg-[#0a0e13] px-4 py-7 text-[#dde4dd] sm:px-6 sm:py-10 lg:px-10">
+        <div className="mx-auto w-full max-w-6xl">
+          <p className="font-mono-code text-[11px] font-semibold tracking-wide text-[#a6b5aa] mb-5">
+            ~/workspace/devmates
+          </p>
+
+          {/* Top Hero Status Banner */}
+          <div className="rounded-xl border border-[#1b2b22] bg-[#0c140f] p-5 sm:p-7 shadow-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-3 font-mono-code text-[11px] pb-3">
+              <div className="flex items-center gap-0.5 sm:gap-1.5 ">
+                <span className="text-[#6f7c73]">~/</span>
+                <span className="text-[#86948a]">billing</span>
+                <span className="text-[#6f7c73]">/</span>
+                <span className="text-[#4edea3] font-bold">checkout_success</span>
+                <span className="text-[#6f7c73]">::</span>
+                <span className="text-[#86948a]">SESSION_200_OK</span>
+              </div>
+
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#234333] bg-[#10241b] px-3 py-1 font-mono-code text-[10px] font-bold tracking-wider text-[#4edea3]">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4edea3] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4edea3]"></span>
+                </span>
+                <span>PRO_NODE_ACTIVE // ACCESS_LEVEL: FULL_TIER</span>
+              </div>
+            </div>
+
+            <h1 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-[#e1e7e1] flex items-center flex-wrap gap-2">
+              <span>You're now a</span>
+              <span className="text-[#4edea3] underline decoration-[#258461] underline-offset-4">DevMates Pro</span>
+              <span>Member</span>
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#4edea3] text-[#082317] ml-1">
+                <Check className="w-4 h-4 stroke-[3]" />
+              </span>
+            </h1>
+
+            <p className="mt-3 text-xs sm:text-sm font-mono-code leading-relaxed text-[#b5c4b9] max-w-3xl">
+              Order <strong className="font-bold text-[#dde4dd]">{orderId}</strong> confirmed. <span className="text-[#4edea3]">₹10</span> billed via <span className="capitalize">{method}</span>. Your pro credentials, accelerated matching queue, and developer status have been provisioned across the cluster.
+            </p>
+
+            {/* 3 Metric Cards */}
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono-code">
+              <div className="rounded border border-[#1b2720] bg-[#08100b] p-3.5">
+                <span className="block text-[10px] font-semibold text-[#6f7c73] tracking-wider uppercase mb-1">STATUS</span>
+                <div className="flex items-center gap-2 text-xs font-bold text-[#4edea3]">
+                  <span className="h-2 w-2 rounded-full bg-[#4edea3]"></span>
+                  <span>ACTIVE_PREMIUM</span>
+                </div>
+              </div>
+
+              <div className="rounded border border-[#1b2720] bg-[#08100b] p-3.5">
+                <span className="block text-[10px] font-semibold text-[#6f7c73] tracking-wider uppercase mb-1">VALIDITY</span>
+                <span className="text-xs font-bold text-[#dde4dd]">Lifetime Validity</span>
+              </div>
+
+              <div className="rounded border border-[#1b2720] bg-[#08100b] p-3.5">
+                <span className="block text-[10px] font-semibold text-[#6f7c73] tracking-wider uppercase mb-1">RATE_LIMIT</span>
+                <span className="text-xs font-bold text-[#dde4dd]">UNLIMITED_IO</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Lower Grid Cards */}
+          <div className="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Receipt Summary Card */}
+            <div className="lg:col-span-7 rounded-xl border border-[#1b2b22] bg-[#0c140f] p-5 sm:p-6 shadow-xl flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between pb-4 border-b border-[#1b2620]">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 rounded bg-[#152e22] text-[#4edea3]">
+                      <Receipt className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-bold text-[#e1e7e1]">Receipt Summary</h3>
+                      <p className="font-mono-code text-[10px] text-[#6f7c73]">TXN_STAMP: 2025-05-18T14:32:09Z</p>
+                    </div>
+                  </div>
+
+                  <span className="font-mono-code text-[10px] font-bold px-2.5 py-1 rounded bg-[#133022] border border-[#234d38] text-[#4edea3] tracking-wider">
+                    PAID
+                  </span>
+                </div>
+
+                {/* Table details */}
+                <div className="mt-4 space-y-3 font-mono-code text-xs">
+                  <div className="flex items-center justify-between text-[#b5c4b9]">
+                    <span className="text-[#86948a]">Tier Subscription</span>
+                    <span className="font-semibold text-[#dde4dd]">Early Builder Pass (Monthly)</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[#b5c4b9]">
+                    <span className="text-[#86948a]">Invoice Number</span>
+                    <span className="font-semibold text-[#dde4dd]">{orderId}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[#b5c4b9]">
+                    <span className="text-[#86948a]">Payment Method</span>
+                    <span className="font-semibold text-[#dde4dd] flex items-center gap-1.5">
+                      <span className="inline-flex items-center justify-center w-4 h-4 rounded border border-[#234d38] bg-[#10241b] text-[#4edea3] text-[9px] ">💳</span>
+                      <span className="capitalize">{method}</span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-[#b5c4b9]">
+                    <span className="text-[#86948a]">Billing Cycle</span>
+                    <span className="font-semibold text-[#dde4dd]">Lifetime Validity</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Total Settled */}
+              <div className="mt-6 pt-4 border-t border-[#1b2620] flex items-center justify-between">
+                <span className="font-bold text-sm text-[#e1e7e1]">Total Settled</span>
+                <span className="text-xl sm:text-2xl font-bold font-mono-code text-[#4edea3]">₹10.00</span>
+              </div>
+            </div>
+
+            {/* Notice Card */}
+            <div className="lg:col-span-5 rounded-xl border border-[#1b2b22] bg-[#0c140f] p-5 sm:p-6 shadow-xl flex flex-col justify-start">
+              <div className="flex items-center gap-2.5 font-mono-code text-xs font-bold text-[#38bdf8] mb-3">
+                <div className="p-1.5 rounded bg-[#0f2838] text-[#38bdf8]">
+                  <Megaphone className="w-4 h-4" />
+                </div>
+                <span>[NOTICE] FULL_PERKS_SCHEDULED_ROLLOUT</span>
+              </div>
+
+              <p className="text-xs sm:text-sm font-mono-code leading-relaxed text-[#b5c4b9]">
+                Full perks related to DevMates Pro will be announced soon. You are holding an early genesis node with guaranteed grandfathered pricing of ₹10/cycle for continuous membership.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    ) : (
     <section className="min-h-[calc(100vh-4rem)] bg-[#0a0e13] px-4 py-7 text-[#dde4dd] sm:px-6 sm:py-10 lg:px-10">
       <div className="mx-auto w-full">
         <p className="font-mono-code text-[11px] font-semibold tracking-wide text-[#a6b5aa]">
@@ -175,6 +327,7 @@ const DevMatesPro = () => {
         </div>  
       </div>
     </section>
+    )
   );
 };
 
