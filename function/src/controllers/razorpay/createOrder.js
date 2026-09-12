@@ -1,5 +1,6 @@
 import express from "express";
 import { razorpayInstance } from "../../utils/razorpayInstance.js";
+import { Payments } from "../../models/Payments.js";
 
 
 export const createOrder = async(req, res) => {
@@ -16,8 +17,16 @@ export const createOrder = async(req, res) => {
                 phone:user.phone
             }
         })
-        console.log("user", user)
-        console.log("orderReq", orderReq)
+
+        const payload = {
+            paymentId: orderReq.id,
+            userId: user._id,
+            paymentStatus: orderReq.status
+        }
+
+        const new_doc = new Payments(payload)
+        await new_doc.save()
+
         res.status(200).json({orderReq, "key":process.env.Razor_PAY_API_KEY})
 
     } catch (error) {

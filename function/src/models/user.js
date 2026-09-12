@@ -37,7 +37,9 @@ const userSchema = new mongoose.Schema(
             type:[String], 
             minlength:1, 
             set:(incomingArray) => {return [...new Set(incomingArray)]} //remove duplicate
-        }
+        },
+        isPremium:{type:Boolean, default:false}
+        
     },
     { timestamps: true }
 )
