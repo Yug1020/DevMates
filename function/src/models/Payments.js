@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const paymentSchema = new mongoose.Schema({
-
-    paymentId:{type:String, require:true},
-    userId:{type:mongoose.ObjectId, ref:"User", require:true},
-    paymentStatus: {type:String, require:true}
-}, {timestamps:true})
+    paymentId: { type: String, required: true },
+    userId: { type: mongoose.ObjectId, ref: "User", required: true },
+    paymentStatus: { type: String, required: true },
+    status: { type: String }
+}, { timestamps: true });
 
 const Payments = mongoose.model("Payments", paymentSchema);
 

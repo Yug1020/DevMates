@@ -22,7 +22,11 @@ app.use(cors({
 }))
 
 async function main(){
-app.use(express.json())
+app.use(express.json({
+    verify: (req, res, buf) => {
+        req.rawBody = buf.toString();
+    }
+}))
 app.use(cookieParser())
 
 //only routes without restriction

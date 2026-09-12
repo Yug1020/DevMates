@@ -11,17 +11,19 @@ export const createOrder = async(req, res) => {
             currency: "INR",
             receipt: "receipt#1",
             notes: {
+                userId: user._id.toString(),
                 firstName: user.firstName,
                 lastName: user.lastName,
-                email:user.email,
-                phone:user.phone
+                email: user.email,
+                phone: user.phone
             }
         })
 
         const payload = {
             paymentId: orderReq.id,
             userId: user._id,
-            paymentStatus: orderReq.status
+            paymentStatus: orderReq.status,
+            status: orderReq.status
         }
 
         const new_doc = new Payments(payload)
