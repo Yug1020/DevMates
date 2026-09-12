@@ -6,4 +6,4 @@ import { callWeebhook } from "../controllers/razorpay/callWeebhook.js";
 export const razorpay = express.Router();
 
 razorpay.post(/^\/createOrder$/, authHandler, createOrder);
-razorpay.post(/^\/weebhook$/, callWeebhook);
+razorpay.post(/^\/webhook$/, callWeebhook);
