@@ -10,7 +10,7 @@ export const verifyPayment = async(req, res) => {
         const payload = {orderId, status, method}
 
         if(user.isPremium){
-            return res.status(200).send({payload, isPremium:true})
+            return res.status(200).send({payload})
         }else{
             return res.status(404).send("User is not premium")
         }

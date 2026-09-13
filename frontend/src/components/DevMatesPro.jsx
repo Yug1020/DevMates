@@ -4,10 +4,10 @@ import axios from "axios";
 import { API_BASE_URL } from "../util/constant";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const DevMatesPro = () => {
-
-  const [ isPro, setIsPro ] = useState(false)
+  const isPro = useSelector((store) => store.user.isPremium);
   const [ orderId, setOrderId ] = useState("")
   const [ method, setMethod ] = useState("")
 
@@ -97,9 +97,7 @@ const DevMatesPro = () => {
     axios
     .get(API_BASE_URL + "/razorpay/verifyPayment", {withCredentials:true})
     .then((res) => {
-      console.log(res)
       if(res.data.isPremium){
-        setIsPro(true)
         setOrderId(res.data.payload.orderId)
         setMethod(res.data.payload.method)
       }})
