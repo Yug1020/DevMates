@@ -19,6 +19,7 @@ export const login = async (req, res) => {
         if (isMail.streetName) filteredUserInfo.streetName = isMail.streetName;
         if (isMail.profession) filteredUserInfo.profession = isMail.profession;
         if (isMail.goal) filteredUserInfo.goal = isMail.goal;
+        if (isMail.goalDeadline) filteredUserInfo.goalDeadline = isMail.goalDeadline;
         if (isMail.bio) filteredUserInfo.bio = isMail.bio;
 
         //Mongoose method of password verification
