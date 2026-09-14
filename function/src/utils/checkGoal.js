@@ -19,13 +19,15 @@ export const checkGoal = CronJob.from({
             const expiredUsers = await User.find(query);
             
             for (const user of expiredUsers) {
-                const bellPayload = {
-                    user_id: user._id,
-                    // Bell.messages is a String, not an array of strings.
-                    messages: `${user.firstName}, you hit your ${user.goal} goal deadline. Please extend the deadline or add a new goal.`
-                };
-                const bell = new Bell(bellPayload);
-                await bell.save();
+                const messageText = `${user.firstName}, you hit your ${user.goal} goal deadline. Please extend the deadline or add a new goal.`;
+
+                    // 1. Append the message or create a new document if it doesn't exist
+                    await Bell.updateOne(
+                        { userId: user._id },     
+                        { $push: { messages: messageText } },
+                        { upsert: true }
+                    );
+
                 await User.findByIdAndUpdate(
                     user._id,
                     { $set: { goal: null, goalDeadline: null } }

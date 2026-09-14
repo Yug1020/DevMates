@@ -33,13 +33,13 @@ export default function LoginPopover({ open, onClose }) {
                 id="goal-required-title"
                 className="font-mono-code text-sm font-semibold text-[#dde4dd]"
               >
-                Set Your Current Goal
+                Set Your Current Goal and Target Deadline
               </h2>
               <p
                 id="goal-required-description"
                 className="mt-1.5 text-xs leading-relaxed text-[#9aa89f]"
               >
-                Your goal field is empty. Please add your current goal and target
+                Your goal field or target is empty. Please add your current goal and target
                 deadline in your profile so developers with similar goals can
                 discover and connect with you to build and stay accountable.
               </p>

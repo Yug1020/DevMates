@@ -6,8 +6,16 @@ import { setUser } from '../store/userSlice';
 import { API_BASE_URL } from './constant.js';
 import LoginPopover from '../components/loginPopover';
 
-const hasEmptyGoal = (goal) =>
-    typeof goal !== 'string' || goal.trim().length === 0;
+const hasEmptyGoal = (goal, goalDeadline) => {
+    // True if goal is null, undefined, or just empty spaces
+    const isGoalEmpty = !goal || (typeof goal === 'string' && goal.trim().length === 0);
+    
+    // True if deadline is null, undefined, or an empty string
+    const isDeadlineEmpty = !goalDeadline; 
+
+    // Opens popover if goal OR deadline is missing
+    return isGoalEmpty || isDeadlineEmpty;
+};
 
 const ProtectedRoutes = () => {
     // 1. Check if the user is in the Redux store
@@ -15,7 +23,7 @@ const ProtectedRoutes = () => {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(!user);
     const [showGoalPopover, setShowGoalPopover] = useState(() =>
-        Boolean(user && hasEmptyGoal(user.goal))
+        Boolean(user && hasEmptyGoal(user.goal, user.goalDeadline))
     );
 
     useEffect(() => {
@@ -26,10 +34,10 @@ const ProtectedRoutes = () => {
             .get(API_BASE_URL + '/user/profile', { withCredentials: true })
             .then((res) => {
                 dispatch(setUser(res.data));
-                setShowGoalPopover(hasEmptyGoal(res.data?.goal));
+                setShowGoalPopover(hasEmptyGoal(res.data?.goal, res.data?.goalDeadline));
             })
             .catch(() => {
-                // Session expired or invalid cookie
+                console.log("Session expired or invalid cookie")
             })
             .finally(() => {
                 setLoading(false);
