@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { checkGoal } from "./src/utils/checkGoal.js";
+import { initializeSocket } from "./src/utils/socket.js";
+import http from "http";
 
 import { authRoute } from "./src/route/authRoute.js";
 import { userRoute } from "./src/route/userRoute.js";
@@ -10,16 +12,16 @@ import { profileRoute } from "./src/route/profileRoute.js";
 import { connectionReqRoute } from "./src/route/connectionReqRoute.js";
 import { razorpay } from "./src/route/razorpay.js";
 
-
 import dotenv from "dotenv";
 dotenv.config();
-
 
 const app = express()
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true,
 }))
+const server = http.createServer(app);
+initializeSocket(server)
 
 async function main(){
 app.use(express.json({
@@ -37,17 +39,14 @@ app.use("/user/profile", profileRoute);
 app.use("/connections", connectionReqRoute);
 app.use("/razorpay", razorpay);
 
-
-
-
 try {
     await mongoose.connect(process.env.MONGODB)
     console.log("successfully connected to DB")   
     checkGoal.start();
     console.log(`Goal checker scheduled for ${checkGoal.nextDate().toISO()}`);
-    app.listen(5375, console.log("successfully live on 5375"))
+    server.listen(5375, console.log("successfully live on 5375"))
 }
 catch(error){
-        console.log(error)
+    console.log(error)
 }
 }main()

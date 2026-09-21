@@ -3,6 +3,8 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/oxanium";
+@import '@fontsource/space-mono';
+
 
 @custom-variant dark (&:is(.dark *));
 

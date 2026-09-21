@@ -14,7 +14,7 @@ export const login = async (req, res) => {
             return res.status(404).send("Invalid credentials")
         }
 
-        const filteredUserInfo = { firstName: isMail.firstName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, photoURL: isMail.photoURL, skills: isMail.skills, isPremium: isMail.isPremium}
+        const filteredUserInfo = { userId:isMail._id, firstName: isMail.firstName, email: isMail.email, gender: isMail.gender, age: isMail.age, phone: isMail.phone, photoURL: isMail.photoURL, skills: isMail.skills, isPremium: isMail.isPremium}
         if (isMail.lastName) filteredUserInfo.lastName = isMail.lastName;
         if (isMail.streetName) filteredUserInfo.streetName = isMail.streetName;
         if (isMail.profession) filteredUserInfo.profession = isMail.profession;
