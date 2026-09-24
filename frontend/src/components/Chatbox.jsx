@@ -10,6 +10,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { connectionSocketIo } from "../util/socket.js";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import { API_BASE_URL } from "../util/constant.js";
 
 function CodeBlock({ filename, code }) {
   const [copied, setCopied] = useState(false);
@@ -122,6 +124,7 @@ function CodeBlock({ filename, code }) {
 
 export function ChatBox({ user, onMessageReceived }) {
   const [inputMessage, setInputMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
   const targetId = user?._id;
@@ -139,6 +142,8 @@ export function ChatBox({ user, onMessageReceived }) {
     socketRef.current = socket;
 
     const handleMessageReceived = (message) => {
+      // The sender adds the saved API response locally. Ignore its echoed socket event.
+      if (String(message?.senderId) === String(userId)) return;
       onMessageReceived(targetId, message);
     };
 
@@ -152,21 +157,35 @@ export function ChatBox({ user, onMessageReceived }) {
     };
   }, [userId, targetId, firstName, onMessageReceived]);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e?.preventDefault();
     const messageText = inputMessage.trim();
     const socket = socketRef.current;
 
-    if (!messageText || !userId || !targetId || !socket) return;
+    if (!messageText || !userId || !targetId || isSending) return;
 
-    socket.emit("sendmsg", {
-      senderName: firstName,
-      newMessage: messageText,
-      userId,
-      targetId,
-    });
+    setIsSending(true);
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/chat/sendTxt`,
+        { receiverId: targetId, message: messageText },
+        { withCredentials: true }
+      );
 
-    setInputMessage("");
+      // Render the database record immediately, then notify the other user in real time.
+      onMessageReceived(targetId, response.data.message);
+      socket?.emit("sendmsg", {
+        senderName: firstName,
+        newMessage: messageText,
+        userId,
+        targetId,
+      });
+      setInputMessage("");
+    } catch (error) {
+      console.error("Unable to send message:", error);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -310,7 +329,7 @@ export function ChatBox({ user, onMessageReceived }) {
           {/* Send Button */}
           <button
             type="submit"
-            disabled={!inputMessage.trim()}
+            disabled={!inputMessage.trim() || isSending}
             className="h-8 w-8 rounded bg-[#4edea3] hover:bg-[#3cd092] disabled:opacity-40 disabled:hover:bg-[#4edea3] text-[#081b12] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
             title="Send message"
           >

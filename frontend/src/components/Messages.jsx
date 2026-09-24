@@ -6,6 +6,34 @@ import axios from "axios";
 import { API_BASE_URL } from "../util/constant.js";
 import { useSelector } from "react-redux";
 
+const formatMessageTime = (value) => {
+  if (!value) {
+    return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? value
+    : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};
+
+const normalizeMessage = (message, currentUserId, currentUserName, otherUser) => {
+  const senderId = String(message.senderId ?? "");
+  const isOutgoing = senderId === String(currentUserId);
+  const otherUserName = [otherUser?.firstName, otherUser?.lastName]
+    .filter(Boolean)
+    .join(" ") || "Unknown";
+
+  return {
+    id: message._id ?? message.id ?? `msg_${Date.now()}`,
+    senderId,
+    senderName: message.senderName || (isOutgoing ? currentUserName : otherUserName),
+    time: message.time || formatMessageTime(message.createdAt),
+    isOutgoing,
+    content: message.text ?? message.content ?? message.newMessage ?? "",
+  };
+};
+
 // Initial mock conversations dataset matching reference design
 // const INITIAL_CONVERSATIONS = [
 //   {
@@ -136,43 +164,73 @@ export default function Messages() {
   const [conversations, setConversations] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
-  const currentUserId = useSelector((state) => state?.user?.userId);
+  const currentUser = useSelector((state) => state?.user);
+  const currentUserId = currentUser?.userId;
+  const currentUserName = currentUser?.firstName || "You";
 
   const activeConversation = conversations.find((c) => c._id === selectedUserId);
 
   const handleMessageReceived = useCallback((targetId, message) => {
-    const content = message?.content ?? message?.newMessage;
+    const content = message?.text ?? message?.content ?? message?.newMessage;
     if (!content) return;
 
-    const normalizedMessage = {
-      id: message.id || `msg_${Date.now()}`,
-      sender: message.senderName || "Unknown",
-      senderName: message.senderName || "Unknown",
-      time: message.time || new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      isOutgoing: String(message.senderId) === String(currentUserId),
-      content,
-    };
-
     setConversations((prev) =>
-      prev.map((c) => {        
-        if (c._id === targetId) {
+      prev.map((conversation) => {
+        if (conversation._id === targetId) {
+          const normalizedMessage = normalizeMessage(
+            message,
+            currentUserId,
+            currentUserName,
+            conversation
+          );
+
+          if (conversation.messages?.some((item) => item.id === normalizedMessage.id)) {
+            return conversation;
+          }
+
           return {
-            ...c,
+            ...conversation,
             lastMessage: content,
             timestamp: "Just now",
             messages: [
-              ...(Array.isArray(c.messages) ? c.messages : []),
+              ...(Array.isArray(conversation.messages) ? conversation.messages : []),
               normalizedMessage,
             ],
           };
         }
-        return c;
+        return conversation;
       })
     );
-  }, [currentUserId]);
+  }, [currentUserId, currentUserName]);
+
+  const handleSelectUser = useCallback(async (targetId) => {
+    setSelectedUserId(targetId);
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/chat/prevChats`, {
+        params: { targetId },
+        withCredentials: true,
+      });
+      const savedMessages = Array.isArray(response.data?.messages)
+        ? response.data.messages
+        : [];
+
+      setConversations((previousConversations) =>
+        previousConversations.map((conversation) =>
+          conversation._id === targetId
+            ? {
+                ...conversation,
+                messages: savedMessages.map((message) =>
+                  normalizeMessage(message, currentUserId, currentUserName, conversation)
+                ),
+              }
+            : conversation
+        )
+      );
+    } catch (error) {
+      console.error("Unable to load this conversation:", error);
+    }
+  }, [currentUserId, currentUserName]);
 
   useEffect(() => {
     axios
@@ -193,7 +251,7 @@ export default function Messages() {
       <NetworkList
         users={conversations}
         selectedUserId={selectedUserId}
-        onSelectUser={setSelectedUserId}
+        onSelectUser={handleSelectUser}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />

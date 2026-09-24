@@ -11,6 +11,7 @@ import { userRoute } from "./src/route/userRoute.js";
 import { profileRoute } from "./src/route/profileRoute.js";
 import { connectionReqRoute } from "./src/route/connectionReqRoute.js";
 import { razorpay } from "./src/route/razorpay.js";
+import { chatRoute } from "./src/route/chatRoute.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -38,6 +39,7 @@ app.use("/user", userRoute);
 app.use("/user/profile", profileRoute);
 app.use("/connections", connectionReqRoute);
 app.use("/razorpay", razorpay);
+app.use("/chat", chatRoute);
 
 try {
     await mongoose.connect(process.env.MONGODB)
