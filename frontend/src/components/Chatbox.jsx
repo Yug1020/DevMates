@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import {
+  ArrowLeft,
   Paperclip,
   Send,
   MoreVertical,
@@ -122,7 +123,7 @@ function CodeBlock({ filename, code }) {
   );
 }
 
-export function ChatBox({ user, onMessageReceived }) {
+export function ChatBox({ user, onMessageReceived, onBack }) {
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef(null);
@@ -206,15 +207,28 @@ export function ChatBox({ user, onMessageReceived }) {
   return (
     <div className="flex-1 flex flex-col h-full bg-[#090e11] min-w-0">
       {/* Header */}
-      <div className="h-14 px-4 sm:px-6 border-b border-[#1a2328] bg-[#070b0e]/90 backdrop-blur flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="relative">
+      <div className="h-14 px-3 sm:px-6 border-b border-[#1a2328] bg-[#070b0e]/90 backdrop-blur flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {/* Back button on left of profile image (visible on mobile only) */}
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="md:hidden p-1.5 -ml-1 rounded-lg text-[#7e8e83] hover:text-[#dde4dd] hover:bg-[#121a1f] transition-colors cursor-pointer flex items-center justify-center shrink-0"
+              aria-label="Back to conversations list"
+              title="Back"
+            >
+              <ArrowLeft className="w-5 h-5 text-[#dde4dd]" />
+            </button>
+          )}
+
+          <div className="relative shrink-0">
             <Avatar className="h-8 w-8 rounded-md border border-[#1a252b] bg-[#0d1418]">
               {user.photoURL ? (
-                <AvatarImage src={user.photoURL} alt={user.username} className="object-cover" />
+                <AvatarImage src={user.photoURL} alt={user.username || user.firstName} className="object-cover" />
               ) : null}
               <AvatarFallback className="bg-[#121c21] text-[#a6b5aa] font-mono-code text-xs font-semibold rounded-md">
-                {user.photoURL || user.firstName.slice(0, 2).toUpperCase()}
+                {user.firstName ? user.firstName.slice(0, 2).toUpperCase() : "DM"}
               </AvatarFallback>
             </Avatar>
             {user.status === "online" && (
@@ -222,9 +236,9 @@ export function ChatBox({ user, onMessageReceived }) {
             )}
           </div>
 
-          <div>
-            <h2 className="text-xs font-mono-code font-bold text-[#dde4dd]">
-              {user.firstName + " " + user.lastName}
+          <div className="min-w-0">
+            <h2 className="text-xs font-mono-code font-bold text-[#dde4dd] truncate">
+              {[user.firstName, user.lastName].filter(Boolean).join(" ") || user.username || "User"}
             </h2>
             <div className="flex items-center gap-1.5 text-[10px] font-mono-code text-[#4edea3]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#4edea3]" />
@@ -235,7 +249,7 @@ export function ChatBox({ user, onMessageReceived }) {
 
         <button
           type="button"
-          className="p-1.5 rounded text-[#7e8e83] hover:text-[#dde4dd] hover:bg-[#121a1f] transition-colors cursor-pointer"
+          className="p-1.5 rounded text-[#7e8e83] hover:text-[#dde4dd] hover:bg-[#121a1f] transition-colors cursor-pointer shrink-0"
           title="Conversation options"
         >
           <MoreVertical className="w-4 h-4" />
@@ -319,7 +333,7 @@ export function ChatBox({ user, onMessageReceived }) {
           {/* Text Input */}
           <input
             type="text"
-            className="w-full flex flex-row items-center justify-between border-none text-xs sm:text-[13px] font-mono- text-[#dde4dd] placeholder:text-[#4b5b54] focus:outline-none px-1 py-1"
+            className="w-full flex flex-row items-center justify-between border-none text-xs sm:text-[13px] font-mono-code text-[#dde4dd] placeholder:text-[#4b5b54] focus:outline-none px-1 py-1"
             placeholder="Type a message or paste code..."
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}

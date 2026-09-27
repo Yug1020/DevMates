@@ -3,15 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function NetworkList({ users, selectedUserId, onSelectUser, searchQuery, onSearchChange }) {
-  const filteredUsers = users.filter(
+  const filteredUsers = (users || []).filter(
     (u) =>
-      u.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.lastName.toLowerCase().includes(searchQuery.toLowerCase())
-      // u.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+      u.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.lastName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="w-full sm:w-80 md:w-80 lg:w-80 shrink-0 border-r border-[#1a2328] bg-[#070b0e] flex flex-col h-full select-none">
+    <div className="w-full md:w-80 shrink-0 md:border-r border-[#1a2328] bg-[#070b0e] flex flex-col h-full select-none">
       {/* Search Header */}
       <div className="p-3 border-b border-[#1a2328]">
         <div className="relative flex items-center">
@@ -44,7 +43,7 @@ export function NetworkList({ users, selectedUserId, onSelectUser, searchQuery, 
                 className={`w-full text-left p-3 flex items-start gap-3 transition-colors cursor-pointer
                     ${
                         isSelected
-                          ? "bg-[#10171c] border-l-2 border-surface-tint"
+                          ? "bg-[#10171c] border-l-2 border-[#4edea3]"
                           : "hover:bg-[#0c1216] border-l-2 border-transparent"
                     }                    
                 `}
@@ -53,15 +52,14 @@ export function NetworkList({ users, selectedUserId, onSelectUser, searchQuery, 
                 <div className="relative shrink-0 mt-0.5">
                   <Avatar className="h-9 w-9 rounded-md border border-[#1a252b] bg-[#0d1418]">
                     {user.photoURL ? (
-                      <AvatarImage src={user.photoURL} alt={user.username} className="object-cover" />
+                      <AvatarImage src={user.photoURL} alt={user.username || user.firstName} className="object-cover" />
                     ) : null}
                     <AvatarFallback className="bg-[#121c21] text-[#a6b5aa] font-mono-code text-xs font-semibold rounded-md">
-                      {user.firstName.slice(0, 2).toUpperCase()} 
-                      {/* user.photoURL ||  */}
+                      {user.firstName ? user.firstName.slice(0, 2).toUpperCase() : "DM"}
                     </AvatarFallback>
                   </Avatar>
                   {user.status === "online" && (
-                    <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#surface-tint] ring-2 ring-[#070b0e]" />
+                    <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#4edea3] ring-2 ring-[#070b0e]" />
                   )}
                 </div>
 
@@ -73,7 +71,7 @@ export function NetworkList({ users, selectedUserId, onSelectUser, searchQuery, 
                         isSelected ? "text-[#4edea3]" : "text-[#dde4dd]"
                       }`}
                     >
-                      {user.firstName + " " + user.lastName}
+                      {[user.firstName, user.lastName].filter(Boolean).join(" ") || user.username || "User"}
                     </span>
                     <span className="text-[10px] font-mono-code text-[#5e7067] shrink-0">
                       {user.timestamp}
