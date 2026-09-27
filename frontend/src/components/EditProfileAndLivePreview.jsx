@@ -11,25 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
 const DEFAULT_AVATAR =
   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80';
-
-const AVATAR_PRESETS = [
-  {
-    name: 'Adam',
-    url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80',
-  },
-  {
-    name: 'Eva',
-    url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
-  },
-  {
-    name: 'Cyber',
-    url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&q=80',
-  },
-  {
-    name: 'Dev',
-    url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=256&q=80',
-  },
-];
+const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
 
 const getGoalIcon = (skill = '') => {
   const s = skill.toLowerCase();
@@ -46,6 +28,7 @@ export default function EditProfileAndLivePreview({ onToast }) {
   const reduxUser = useSelector((state) => state.user);
   const location = useLocation();
   const goalInputRef = useRef(null);
+  const profileImageInputRef = useRef(null);
 
   // Form State adhering to userSchema
   const [firstName, setFirstName] = useState(reduxUser?.firstName || 'Alex');
@@ -68,6 +51,10 @@ export default function EditProfileAndLivePreview({ onToast }) {
       : 'React, Node.js, Go, PostgreSQL'
   );
   const [photoURL, setPhotoURL] = useState(reduxUser?.photoURL || DEFAULT_AVATAR);
+  const [profileImage, setProfileImage] = useState(null);
+  const [profilePreview, setProfilePreview] = useState(null);
+  const [imageError, setImageError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!location.state?.focusGoal) return;
@@ -80,9 +67,11 @@ export default function EditProfileAndLivePreview({ onToast }) {
     return () => window.cancelAnimationFrame(frameId);
   }, [location.state?.focusGoal]);
 
-  // Popover State for Profile Picture URL
-  const [showAvatarPopover, setShowAvatarPopover] = useState(false);
-  const [tempPhotoURL, setTempPhotoURL] = useState(photoURL);
+  useEffect(() => {
+    return () => {
+      if (profilePreview) URL.revokeObjectURL(profilePreview);
+    };
+  }, [profilePreview]);
 
   // Parse skills from comma-separated string
   const parsedSkills = skillsInput
@@ -93,83 +82,84 @@ export default function EditProfileAndLivePreview({ onToast }) {
   const displayName =
     [firstName, lastName].filter(Boolean).join(' ') || streetName || 'Developer';
   const goalIcon = getGoalIcon(goal);
+  const displayedPhotoURL = profilePreview || photoURL || DEFAULT_AVATAR;
 
-  // Handle saving profile picture from popover
-  const handleSaveAvatar = () => {
-    setPhotoURL(tempPhotoURL || DEFAULT_AVATAR);
-    setShowAvatarPopover(false);
-    if (onToast) onToast('Profile picture updated!');
+  const handleProfileImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setImageError('Please choose an image file.');
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+      setImageError('Profile image must be 5 MB or smaller.');
+      event.target.value = '';
+      return;
+    }
+
+    setImageError('');
+    setProfileImage(file);
+    setProfilePreview(URL.createObjectURL(file));
   };
 
-  // Handle Save Changes
-  // const handleSaveChanges = (e) => {
-  //   e.preventDefault();
-  //   // const updatedUser = {
-  //   //   ...(reduxUser || {}),
-  //   //   streetName,
-  //   //   phone: Number(phone) || phone,
-  //   //   bio,
-  //   //   skills: parsedSkills,
-  //   //   photoURL,
-  //   // };
+  const removeProfileImage = () => {
+    setProfileImage(null);
+    setProfilePreview(null);
+    setImageError('');
+    if (profileImageInputRef.current) {
+      profileImageInputRef.current.value = '';
+    }
+  };
 
-  //   axios
-  //     .patch(API_BASE_URL + "/user/profile/update", { "streetName": streetName, "phone": phone, "photoURL": photoURL, "skills": [...parsedSkills], "bio": bio }, { withCredentials: true })
-  //     .then(
-  //       dispatch(setUser({
-  //         ...(reduxUser || {}),
-  //         streetName,
-  //         phone: Number(phone) || phone,
-  //         bio,
-  //         skills: parsedSkills,
-  //         photoURL,
-  //       })),
-  //       onToast('Profile changes saved successfully!')
-  //     )
-  //     .catch(error => {
-  //       console.log(error);
-  //       if (onToast) onToast('Failed to save profile changes!');
-  //     });
-  // };
-
-const handleSaveChanges = async (e) => { // 1. Add 'async' to the function definition
+  const handleSaveChanges = async (e) => {
   e.preventDefault();
-
+  setIsSaving(true);
 
   try {
-    // 2. Tell JavaScript to pause here and 'await' the API response
-    await axios.patch(API_BASE_URL + "/user/profile/update", { 
-      "streetName": streetName, 
-      "phone": phone, 
-      "photoURL": photoURL, 
-      "skills": [...parsedSkills], 
-      "bio": bio,
-      "profession": profession,
-      "goal": goal,
-      "goalDeadline": goalDeadline ? goalDeadline.toISOString() : null
-    }, { withCredentials: true });
+    const payload = new FormData();
+    payload.append('streetName', streetName);
+    payload.append('phone', phone);
+    payload.append('skills', JSON.stringify(parsedSkills));
+    payload.append('bio', bio);
+    payload.append('profession', profession);
+    payload.append('goal', goal);
+    payload.append('goalDeadline', goalDeadline ? goalDeadline.toISOString() : '');
+    if (profileImage) {
+      payload.append('profileImage', profileImage);
+    }
 
-    // 3. This code ONLY runs after the await line successfully finishes!
+    const response = await axios.patch(API_BASE_URL + "/user/profile/update", payload, {
+      withCredentials: true,
+    });
+    const savedPhotoURL = response.data?.photoURL || photoURL;
+
     dispatch(setUser({
       ...(reduxUser || {}),
       streetName,
       phone: Number(phone) || phone,
       bio,
       skills: parsedSkills,
-      photoURL,
+      photoURL: savedPhotoURL,
       profession,
       goal,
       goalDeadline: goalDeadline ? goalDeadline.toISOString() : null,
     }));
+
+    setPhotoURL(savedPhotoURL);
+    removeProfileImage();
     
     if (onToast) onToast('Profile changes saved successfully!');
 
-  } catch (error) {
-    // 4. If the await line fails, JavaScript jumps straight down here 🛑
-    console.log(error);
-    if (onToast) onToast('Failed to save profile changes!');
-  }
-};  
+    } catch (error) {
+      console.log(error);
+      if (onToast) onToast('Failed to save profile changes!');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Handle Cancel / Reset to original values
   const handleCancel = () => {
@@ -192,6 +182,7 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
         : 'React, Node.js, Go, PostgreSQL'
     );
     setPhotoURL(reduxUser?.photoURL || DEFAULT_AVATAR);
+    removeProfileImage();
     if (onToast) onToast('Changes reverted');
   };
 
@@ -218,7 +209,7 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
             <div className="flex flex-wrap items-center justify-between gap-4 relative pb-2">
               <div className="flex items-center gap-4">
                 <img
-                  src={photoURL || DEFAULT_AVATAR}
+                  src={displayedPhotoURL}
                   alt="Profile Avatar"
                   className="w-16 h-16 rounded-xl object-cover border border-[#273646] shadow-sm flex-shrink-0"
                   onError={(e) => {
@@ -227,21 +218,38 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
                 />
 
                 <div className="flex-1">
+                  <input
+                    ref={profileImageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleProfileImageChange}
+                  />
                   <button
                     type="button"
-                    onClick={() => {
-                      setTempPhotoURL(photoURL);
-                      setShowAvatarPopover(true);
-                    }}
+                    onClick={() => profileImageInputRef.current?.click()}
                     className="px-3.5 py-1.5 text-xs font-mono-code border border-[#295c73] hover:border-[#38bdf8] text-[#7dd3fc] hover:bg-[#0c2231] rounded transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                    disabled={isSaving}
                   >
                     <span className="material-symbols-outlined text-sm">photo_camera</span>
-                    <span>Change Profile Picture</span>
+                    <span>{profileImage ? 'Change Profile Picture' : 'Choose Profile Picture'}</span>
                   </button>
-                  {/* <p className="text-[11px] font-mono-code text-[#718076] mt-1.5">
-                    JPG, GIF or PNG. Max size of 800K
-                  </p> */}
-
+                  <p className="text-[11px] font-mono-code text-[#718076] mt-1.5">
+                    Images only, up to 5 MB
+                  </p>
+                  {profileImage && (
+                    <button
+                      type="button"
+                      onClick={removeProfileImage}
+                      className="text-[11px] font-mono-code text-[#fc7c78] hover:text-[#ffb4ab] mt-1"
+                      disabled={isSaving}
+                    >
+                      Remove {profileImage.name}
+                    </button>
+                  )}
+                  {imageError && (
+                    <p className="text-[11px] font-mono-code text-[#fc7c78] mt-1">{imageError}</p>
+                  )}
                 </div>
               </div>
 
@@ -254,89 +262,6 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
                   className="text-[11px] font-mono-code px-2.5 py-0.5 rounded bg-[#17212b] border border-[#273646] text-[#9fb0a5] tracking-wide flex-shrink-0 text-center focus:border-[#4edea3] focus:text-[#dde4dd] outline-none transition-colors"
               />
 
-              {/* Profile Picture URL Popover (referencing signUp.jsx:L270-L354) */}
-              {showAvatarPopover && (
-                <div className="absolute left-0 sm:left-20 top-20 z-50 w-72 sm:w-80 bg-[#0e1511] border border-[#3c4a42] rounded-xl p-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-                  <div className="flex items-center justify-between pb-2 mb-3 border-b border-[#242c27]">
-                    <span className="font-mono-label text-xs font-semibold text-[#dde4dd] flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-sm text-[#4edea3]">
-                        image
-                      </span>
-                      Profile Picture URL
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setShowAvatarPopover(false)}
-                      className="text-[#86948a] hover:text-[#dde4dd] text-sm p-1"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {/* Live Thumbnail & Presets */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <img
-                      src={tempPhotoURL || DEFAULT_AVATAR}
-                      alt="Preview"
-                      className="w-12 h-12 rounded-lg object-cover border border-[#3c4a42]"
-                      onError={(e) => {
-                        e.currentTarget.src = DEFAULT_AVATAR;
-                      }}
-                    />
-                    <div className="flex-1">
-                      <p className="text-[11px] font-mono-code text-[#86948a] mb-1">
-                        Quick presets:
-                      </p>
-                      <div className="flex gap-1.5 flex-wrap">
-                        {AVATAR_PRESETS.map((preset) => (
-                          <button
-                            key={preset.name}
-                            type="button"
-                            onClick={() => setTempPhotoURL(preset.url)}
-                            className="px-2 py-0.5 text-[10px] font-mono-code bg-[#1a211d] hover:bg-[#242c27] text-[#4edea3] border border-[#3c4a42] rounded cursor-pointer"
-                          >
-                            {preset.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* URL Input */}
-                  <div className="mb-3">
-                    <label className="block text-[11px] font-mono-code text-[#86948a] mb-1">
-                      Image URL
-                    </label>
-                    <input
-                      type="text"
-                      value={tempPhotoURL}
-                      onChange={(e) => setTempPhotoURL(e.target.value)}
-                      placeholder="https://example.com/avatar.jpg"
-                      className="w-full px-2.5 py-1.5 text-xs font-mono-code rounded border border-[#30363D] bg-[#0D1117] text-[#dde4dd] focus:border-[#4edea3] outline-none"
-                    />
-                  </div>
-
-                  {/* Popover Action Buttons */}
-                  <div className="flex justify-end gap-2 pt-2 border-t border-[#242c27]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTempPhotoURL(DEFAULT_AVATAR);
-                      }}
-                      className="px-2.5 py-1 text-xs text-[#86948a] hover:text-[#dde4dd] font-mono-code cursor-pointer"
-                    >
-                      Reset
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveAvatar}
-                      className="px-3 py-1 text-xs font-mono-code font-semibold bg-[#4edea3] hover:bg-[#6ffbbe] text-[#000000] rounded transition-colors cursor-pointer"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* First Name & Last Name Inputs */}
@@ -523,9 +448,10 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
               </button>
               <button
                 type="submit"
+                disabled={isSaving}
                 className="px-5 py-2 text-xs font-mono-code font-bold bg-[#4edea3] hover:bg-[#6ffbbe] text-[#000000] rounded transition-all shadow-[0_2px_12px_rgba(78,222,163,0.25)] cursor-pointer active:scale-[0.98]"
               >
-                Save Changes
+                {isSaving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </form>
@@ -560,7 +486,7 @@ const handleSaveChanges = async (e) => { // 1. Add 'async' to the function defin
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <img
-                    src={photoURL || DEFAULT_AVATAR}
+                    src={displayedPhotoURL}
                     alt={displayName}
                     className="w-12 h-12 rounded-lg object-cover border border-[#273646] shadow-sm flex-shrink-0"
                     onError={(e) => {

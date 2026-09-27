@@ -1,15 +1,36 @@
-import express from "express";
-import mongoose from "mongoose";
 import { User } from "../../models/user.js";
 import isStrongPassword from "validator/lib/isStrongPassword.js";
 import isEmail from "validator/lib/isEmail.js";
-import bcrypt, { hash } from "bcrypt";
+import bcrypt from "bcrypt";
 import { run } from "../../utils/ses_sendEmail.js";
+import { uploadImage } from "../../utils/uploadImage.js";
+
+const normalizeSkills = (skills) => {
+    if (Array.isArray(skills)) return skills.map((skill) => String(skill).trim()).filter(Boolean);
+    if (typeof skills !== "string") return [];
+
+    try {
+        const parsedSkills = JSON.parse(skills);
+        if (Array.isArray(parsedSkills)) {
+            return parsedSkills.map((skill) => String(skill).trim()).filter(Boolean);
+        }
+    } catch {
+        // JSON is optional for backward compatibility with comma-separated skills.
+    }
+
+    return skills.split(",").map((skill) => skill.trim()).filter(Boolean);
+};
 
 export const signUp = async(req, res) => {
     const required = [ 'firstName', 'lastName', 'email', 'password', 'gender', 'age', 'phone', 'skills', 'profession' ]
     try{
-        const {firstName, lastName, streetName, email, password, gender, age, phone, skills, photoURL, bio, profession} = req.body
+        const body = req.body || {};
+        const missing = required.filter(field => !Object.prototype.hasOwnProperty.call(body, field));
+        if(missing.length !== 0){
+            return res.status(400).send(missing.join(", ") + " is required to sign up")
+        }
+
+        const {firstName, lastName, streetName, email, password, gender, age, phone, skills, bio, profession} = body
         if(!(isEmail(email))){
             return res.status(400).send("Enter Valid Email")
         }
@@ -18,11 +39,6 @@ export const signUp = async(req, res) => {
         }
 
         const hashedpassword = await bcrypt.hash(password, 10);
-
-        const missing = required.filter(field => !(Object.keys(req.body)).includes(field))
-        if(missing.length !== 0){
-            return res.status(400).send(missing.join(", ") + " is required to sign up")
-        }
 
         const newUserData = {
             firstName,
@@ -33,11 +49,15 @@ export const signUp = async(req, res) => {
             gender,
             age,
             phone,
-            skills: Array.isArray(skills) ? skills : (typeof skills === 'string' ? skills.split(',').map(s => s.trim()).filter(Boolean) : [])
+            skills: normalizeSkills(skills)
         }
-        if (photoURL) newUserData.photoURL = photoURL;
         if (bio) newUserData.bio = bio;
         if (profession) newUserData.profession  =  profession;
+
+        if (req.file) {
+            const uploadedImage = await uploadImage(req.file.buffer);
+            newUserData.photoURL = uploadedImage.photoURL;
+        }
 
         const new_user = new User(newUserData)
         await new_user.save()
