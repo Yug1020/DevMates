@@ -26,6 +26,7 @@ export const uploadImage = async (imageBuffer) => {
       },
       (error, result) => {
         if (error) {
+          console.log("cloudinary:-", error)
           reject(error);
           return;
         }

@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../util/constant';
 import axios from 'axios';
 
 const DEFAULT_AVATAR =
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80';
+  'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRqyycj89mRAPKVuSwovlKK16Zh5NoFt11tt7nTNuzR4Nyosm3O';
 const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
 
 export default function SignUp() {
@@ -270,11 +270,11 @@ export default function SignUp() {
                     event.currentTarget.src = DEFAULT_AVATAR;
                   }}
                 />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
+                {/* <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
                   <span className="material-symbols-outlined text-white text-lg">
                     edit
                   </span>
-                </div>
+                </div> */}
               </button>
 
               <input
