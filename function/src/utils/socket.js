@@ -19,7 +19,7 @@ export const initializeSocket = (server) => {
         if (!userId || !targetId) return;
 
         const roomId = getRoomId(userId, targetId);
-        console.log(senderName || userId, "joined the room");
+        // console.log(senderName || userId, "joined the room");
         socket.join(roomId);
       });
 

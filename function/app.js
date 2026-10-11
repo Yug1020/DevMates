@@ -46,7 +46,7 @@ try {
     console.log("successfully connected to DB")   
     checkGoal.start();
     console.log(`Goal checker scheduled for ${checkGoal.nextDate().toISO()}`);
-    server.listen(5375, console.log("successfully live on 5375"))
+    server.listen(5375, console.log("successfully live"))
 }
 catch(error){
     console.log(error)

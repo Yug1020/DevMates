@@ -1,29 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../util/constant';
 import axios from 'axios';
-import { format } from 'date-fns';
-import { Calendar as CalendarIcon, X as XIcon } from 'lucide-react';
-import { Calendar } from '../components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
 
 const DEFAULT_AVATAR =
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80';
-
-const AVATAR_PRESETS = [
-  {
-    name: 'Adam',
-    url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80',
-  },
-  {
-    name: 'Eva',
-    url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
-  },
-  {
-    name: 'Cyber',
-    url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&q=80',
-  },
-];
+  'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRqyycj89mRAPKVuSwovlKK16Zh5NoFt11tt7nTNuzR4Nyosm3O';
+const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -43,16 +25,20 @@ export default function SignUp() {
   const [age, setAge] = useState('');
   const [bio, setBio] = useState('');
   const [skills, setSkills] = useState('');
-  const [photoURL, setPhotoURL] = useState(DEFAULT_AVATAR);
-
-  // Popover State for Profile Picture
-  const [showAvatarPopover, setShowAvatarPopover] = useState(false);
-  const [tempPhotoURL, setTempPhotoURL] = useState(DEFAULT_AVATAR);
+  const [profileImage, setProfileImage] = useState(null);
+  const [profilePreview, setProfilePreview] = useState(null);
+  const profileImageInputRef = useRef(null);
 
   // Submission / Validation state
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  useEffect(() => {
+    return () => {
+      if (profilePreview) URL.revokeObjectURL(profilePreview);
+    };
+  }, [profilePreview]);
 
   // Calculate word count for bio (limit 150 words)
   const countWords = (text) => {
@@ -91,13 +77,33 @@ export default function SignUp() {
 
   const strength = calculatePasswordStrength(password);
 
-  // Handle avatar save from popover
-  const handleSaveAvatar = (e) => {
-    e.preventDefault();
-    if (tempPhotoURL.trim()) {
-      setPhotoURL(tempPhotoURL.trim());
+  const handleProfileImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setErrorMsg('Please choose an image file.');
+      event.target.value = '';
+      return;
     }
-    setShowAvatarPopover(false);
+
+    if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+      setErrorMsg('Profile image must be 5 MB or smaller.');
+      event.target.value = '';
+      return;
+    }
+
+    setErrorMsg('');
+    setProfileImage(file);
+    setProfilePreview(URL.createObjectURL(file));
+  };
+
+  const removeProfileImage = () => {
+    setProfileImage(null);
+    setProfilePreview(null);
+    if (profileImageInputRef.current) {
+      profileImageInputRef.current.value = '';
+    }
   };
 
   // Handle form submission
@@ -145,22 +151,22 @@ export default function SignUp() {
         .map((s) => s.trim())
         .filter(Boolean);
 
-      const payload = {
-        firstName: firstName.trim(),
-        lastName: lastName.trim() || undefined,
-        streetName: streetName.trim() || undefined,
-        email: email.trim(),
-        password,
-        phone: Number(phone),
-        gender,
-        age: Number(age),
-        profession: profession.trim() || undefined,
-        // goal: goal.trim() || undefined,
-        // goalDeadline: goalDeadline ? goalDeadline.toISOString() : undefined,
-        bio: bio.trim() || undefined,
-        skills: skillsArray,
-        photoURL: photoURL || undefined,
-      };
+      const payload = new FormData();
+      payload.append('firstName', firstName.trim());
+      payload.append('lastName', lastName.trim());
+      payload.append('streetName', streetName.trim());
+      payload.append('email', email.trim());
+      payload.append('password', password);
+      payload.append('phone', phone);
+      payload.append('gender', gender);
+      payload.append('age', age);
+      payload.append('profession', profession.trim());
+      payload.append('bio', bio.trim());
+      payload.append('skills', JSON.stringify(skillsArray));
+
+      if (profileImage) {
+        payload.append('profileImage', profileImage);
+      }
 
       const res = await axios.post(`${API_BASE_URL}/signup`, payload);
 
@@ -233,7 +239,7 @@ export default function SignUp() {
       {/* Right Side: Registration / Create Account Form */}
       <div className="w-full lg:w-7/12 flex items-start lg:items-center justify-center px-4 py-8 sm:px-8 sm:py-10 md:px-12 md:py-12 h-full overflow-y-auto">
         <div className="w-full bg-[#161d19] border border-[#242c27] rounded-xl p-6 sm:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.6)] my-auto relative">
-          {/* Header Row: Title on Left, Avatar Popover Trigger on Right */}
+          {/* Header Row: Title on Left, File-based Avatar Picker on Right */}
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <div className="text-xl sm:text-2xl font-bold text-[#dde4dd] tracking-tight">
@@ -247,122 +253,56 @@ export default function SignUp() {
               </p>
             </div>
 
-            {/* Profile Picture Avatar & Popover Trigger */}
-            <div className="relative">
+            {/* Profile Picture Avatar & File Picker */}
+            <div className="flex flex-col items-end gap-1.5">
               <button
                 type="button"
-                onClick={() => {
-                  setTempPhotoURL(photoURL);
-                  setShowAvatarPopover(!showAvatarPopover);
-                }}
+                onClick={() => profileImageInputRef.current?.click()}
                 className="w-14 h-14 rounded-xl border-2 border-[#3c4a42] hover:border-[#4edea3] transition-all overflow-hidden bg-[#0D1117] flex items-center justify-center group focus:outline-none focus:ring-2 focus:ring-[#4edea3] cursor-pointer shadow-md"
-                title="Click to change profile picture"
+                title="Choose a profile picture from your device"
+                disabled={loading}
               >
-                {photoURL ? (
-                  <img
-                    src={photoURL}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = DEFAULT_AVATAR;
-                    }}
-                  />
-                ) : (
-                  <span className="material-symbols-outlined text-[#86948a] text-3xl group-hover:text-[#4edea3] transition-colors">
-                    account_circle
-                  </span>
-                )}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
+                <img
+                  src={profilePreview || DEFAULT_AVATAR}
+                  alt="Profile preview"
+                  className="w-full h-full object-cover"
+                  onError={(event) => {
+                    event.currentTarget.src = DEFAULT_AVATAR;
+                  }}
+                />
+                {/* <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
                   <span className="material-symbols-outlined text-white text-lg">
                     edit
                   </span>
-                </div>
+                </div> */}
               </button>
 
-              {/* Profile Picture URL Popover */}
-              {showAvatarPopover && (
-                <div className="absolute right-0 top-16 z-50 w-72 sm:w-80 bg-[#0e1511] border border-[#3c4a42] rounded-lg p-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-                  <div className="flex items-center justify-between pb-2 mb-3 border-b border-[#242c27]">
-                    <span className="font-mono-label text-xs font-semibold text-[#dde4dd] flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-sm text-[#4edea3]">
-                        image
-                      </span>
-                      Profile Picture URL
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setShowAvatarPopover(false)}
-                      className="text-[#86948a] hover:text-[#dde4dd] text-sm"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {/* Live Preview & Presets */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <img
-                      src={tempPhotoURL || DEFAULT_AVATAR}
-                      alt="Preview"
-                      className="w-12 h-12 rounded-lg object-cover border border-[#3c4a42]"
-                      onError={(e) => {
-                        e.target.src = DEFAULT_AVATAR;
-                      }}
-                    />
-                    <div className="flex-1">
-                      <p className="text-[11px] font-mono-code text-[#86948a] mb-1">
-                        Quick presets:
-                      </p>
-                      <div className="flex gap-1.5 flex-wrap">
-                        {AVATAR_PRESETS.map((preset) => (
-                          <button
-                            key={preset.name}
-                            type="button"
-                            onClick={() => setTempPhotoURL(preset.url)}
-                            className="px-2 py-0.5 text-[10px] font-mono-code bg-[#1a211d] hover:bg-[#242c27] text-[#4edea3] border border-[#3c4a42] rounded"
-                          >
-                            {preset.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* URL Input */}
-                  <div className="mb-3">
-                    <label className="block text-[11px] font-mono-code text-[#86948a] mb-1">
-                      Image URL
-                    </label>
-                    <input
-                      type="text"
-                      value={tempPhotoURL}
-                      onChange={(e) => setTempPhotoURL(e.target.value)}
-                      placeholder="https://example.com/avatar.jpg"
-                      className="w-full px-2.5 py-1.5 text-xs font-mono-code rounded border border-[#30363D] bg-[#0D1117] text-[#dde4dd] focus:border-[#4edea3]"
-                    />
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex justify-end gap-2 pt-2 border-t border-[#242c27]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTempPhotoURL(DEFAULT_AVATAR);
-                        setPhotoURL(DEFAULT_AVATAR);
-                        setShowAvatarPopover(false);
-                      }}
-                      className="px-2.5 py-1 text-xs text-[#86948a] hover:text-[#dde4dd] font-mono-code"
-                    >
-                      Reset
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveAvatar}
-                      className="px-3 py-1 text-xs font-mono-code font-semibold bg-[#4edea3] hover:bg-[#6ffbbe] text-[#000000] rounded transition-colors"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                </div>
+              <input
+                ref={profileImageInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleProfileImageChange}
+              />
+              <button
+                type="button"
+                onClick={() => profileImageInputRef.current?.click()}
+                className="text-[11px] font-mono-code text-[#89ceff] hover:text-[#c9e6ff]"
+                disabled={loading}
+              >
+                {profileImage ? 'Change image' : 'Upload image'}
+              </button>
+              {profileImage ? (
+                <button
+                  type="button"
+                  onClick={removeProfileImage}
+                  className="text-[10px] font-mono-code text-[#fc7c78] hover:text-[#ffb4ab]"
+                  disabled={loading}
+                >
+                  Remove {profileImage.name}
+                </button>
+              ) : (
+                <span className="text-[10px] font-mono-code text-[#86948a]">Images only, up to 5 MB</span>
               )}
             </div>
           </div>
