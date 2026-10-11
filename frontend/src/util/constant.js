@@ -1,1 +1,1 @@
-export const API_BASE_URL = location.hostname === "localhost" ? "http://localhost:5375" : import.meta.env.VITE_API_URL
+export const API_BASE_URL = location.hostname === "localhost" ? "http://localhost:5375" : "https://devmates.onrender.com"
