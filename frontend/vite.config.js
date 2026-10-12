@@ -15,4 +15,13 @@ export default defineConfig({
       "@": `${import.meta.dirname}/src`,
     },
   },
+  // server: {
+  //   proxy: {
+  //     '/api': {
+  //       target: 'http://localhost:5375',
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/api/, ''),
+  //     },
+  //   },
+  // },
 })

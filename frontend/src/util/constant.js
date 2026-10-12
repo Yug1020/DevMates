@@ -1,1 +1,1 @@
-export const API_BASE_URL = location.hostname === "localhost" ? "http://localhost:5375" : "https://devmates.onrender.com"
+export const API_BASE_URL = location.hostname === "localhost" ? "http://localhost:5375" : "/api"
